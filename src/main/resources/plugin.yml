@@ -1,0 +1,16 @@
+name: HeliosLobby
+author: Teeage
+version: 1.0
+main: de.heliosdevelopment.helioslobby.Lobby
+website: teeage.de
+commands:
+  clearchat:
+  clear:
+  gm:
+  remove:
+  set:
+  vanish:               
+
+         
+   
+    
