@@ -3,6 +3,7 @@ author: Teeage
 version: 1.0
 main: de.heliosdevelopment.helioslobby.Lobby
 website: teeage.de
+softdepend: [HeliosCore]
 commands:
   clearchat:
   clear:

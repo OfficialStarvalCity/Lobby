@@ -1,9 +1,6 @@
 package de.heliosdevelopment.helioslobby;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,21 +15,23 @@ import de.heliosdevelopment.helioslobby.player.Visibility;
 
 public class MySQL {
 
-    private final SQLClient client;
+    // private final SQLClient client;
+    private Connection connection;
 
     public MySQL() throws Exception {
-        SQLInfo sqlInfo = new SQLInfo(
+        /*SQLInfo sqlInfo = new SQLInfo(
                 "127.0.0.1", 3306, "lobby", "root", "1v5z6j7c");
-        this.client = new SQLClient(sqlInfo, "com.mysql.jdbc.Driver", "jdbc:mysql", 1);
+        this.client = new SQLClient(sqlInfo, "com.mysql.jdbc.Driver", "jdbc:mysql", 1);*/
+        connect();
         createTable();
     }
 
-    /*private void connect() {
+    private void connect() {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(
-                    "jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true", user, password);
+                    "jdbc:mysql://127.0.0.1:3306/lobby?autoReconnect=true", "root", "1v5z6j7c");
         } catch (ClassNotFoundException e) {
             System.out.println("Lobby Treiber nicht gefunden");
         } catch (SQLException e) {
@@ -42,20 +41,21 @@ public class MySQL {
             System.out.println("Lobby VendorError: " + e.getErrorCode());
         }
 
-    }*/
+    }
 
     public void close() {
-            try {
-                client.getConnection().close();
-            } catch (SQLException e) {
-                System.out.println("Lobby Fehler: " + e.getMessage());
-            }
+        try {
+            // client.getConnection().close();
+            connection.close();
+        } catch (SQLException e) {
+            System.out.println("Lobby Fehler: " + e.getMessage());
+        }
 
     }
 
-    /*public boolean isConnected() {
+    public boolean isConnected() {
         return connection != null;
-    }*/
+    }
 
     private void createTable() {
         updateSQL("CREATE TABLE IF NOT EXISTS `locations` ( `name` VARCHAR(99) NOT NULL,\n"
@@ -79,7 +79,8 @@ public class MySQL {
     }
 
     private void updateSQL(String statment) {
-        try (Connection connection = client.getConnection()) {
+        //try (Connection connection = client.getConnection()) {
+        try {
             Statement statement = connection.createStatement();
             statement.executeUpdate(statment);
         } catch (SQLException e) {
@@ -88,7 +89,8 @@ public class MySQL {
     }
 
     private ResultSet select(String statement) {
-        try (Connection connection = client.getConnection()) {
+        //try (Connection connection = client.getConnection()) {
+        try {
             Statement query = connection.createStatement();
             return query.executeQuery(statement);
         } catch (SQLException e) {

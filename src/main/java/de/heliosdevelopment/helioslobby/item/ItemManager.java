@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.*;
 
+import de.heliosdevelopment.helioscore.HeliosCore;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -14,13 +15,15 @@ import de.heliosdevelopment.helioslobby.Lobby;
 import de.heliosdevelopment.helioslobby.extras.CosmeticManager;
 import de.heliosdevelopment.helioslobby.manager.HideManager;
 import de.heliosdevelopment.helioslobby.navigator.NavigatorManager;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class ItemManager {
 
-    private final static Set<LobbyItem> items = new HashSet<>();
+    private final List<LobbyItem> items = new ArrayList<>();
+    private final static HeliosCore core = HeliosCore.getInstance();
+    private final static List<Player> cooldown = new ArrayList<>();
 
-    static {
-        items.clear();
+    public ItemManager() {
         items.add(new LobbyItem("§7× §eNavigator §7×", Material.COMPASS, "", null, null) {
             @Override
             public void onInteract(Player player) {
@@ -38,12 +41,36 @@ public class ItemManager {
                 }
             }
         });
-       /* items.add(new LobbyItem("§7× §eNick §7×", Material.NAME_TAG, "lobby.advanced", null, null) {
+        items.add(new LobbyItem("§7× §eNick §7×", Material.NAME_TAG, "lobby.advanced", null, null) {
             @Override
             public void onInteract(Player player) {
-                player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cKommt bald.");
+                if (!cooldown.contains(player)) {
+                    int nicked = core.getNicked(player);
+                    if (nicked == 0) {
+                        core.updateNick(player, 1);
+                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Du hast die Auto-Nick Funktion aktiviert.");
+                    } else if (nicked == -1) {
+                        core.insertNick(player);
+                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Du hast die Auto-Nick Funktion aktiviert.");
+                    } else {
+                        core.updateNick(player, 0);
+                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Du hast die Auto-Nick Funktion deaktiviert.");
+                    }
+                    cooldown.add(player);
+                    new BukkitRunnable() {
+
+                        @Override
+                        public void run() {
+                            cooldown.remove(player);
+                        }
+
+                    }.runTaskLater(Lobby.getInstance(), 100);
+                } else {
+                    player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix")
+                            + "§cDu musst noch einige Sekunden warten, bis du diese Funktion wieder verwenden kannst.");
+                }
             }
-        });*/
+        });
         Dye dye = new Dye();
         dye.setColor(DyeColor.LIME);
         items.add(new LobbyItem("§7× §eSpieler Verstecken §7×", Material.BLAZE_ROD, "", null,
@@ -77,14 +104,17 @@ public class ItemManager {
         });
     }
 
-    public static void getItems(Player player) {
+    public void getItems(Player player) {
 
         final List<LobbyItem> list = new ArrayList<>();
         for (LobbyItem item : items) {
-            if (item.getPermission() != null || item.getPermission() != "")
-                if (player.hasPermission(item.getPermission()))
+            if (item.getPermission() != null || item.getPermission() != "") {
+                if (player.hasPermission(item.getPermission())) {
                     list.add(item);
-            list.add(item);
+                }
+            } else {
+                list.add(item);
+            }
         }
         int[] position = getPosition(list.size());
         for (int i = 0; i < list.size(); i++) {
@@ -93,7 +123,7 @@ public class ItemManager {
         }
     }
 
-    public static LobbyItem getItem(String name) {
+    public LobbyItem getItem(String name) {
         for (LobbyItem item : items) {
             if (item.getName().equalsIgnoreCase(name))
                 return item;
@@ -103,7 +133,7 @@ public class ItemManager {
         return null;
     }
 
-    public static void clearInventory(Player player) {
+    public void clearInventory(Player player) {
         player.getActivePotionEffects().clear();
         player.getInventory().clear();
 
@@ -118,7 +148,7 @@ public class ItemManager {
         player.setFireTicks(0);
     }
 
-    private static int[] getPosition(int items) {
+    private int[] getPosition(int items) {
         if ((items < 1) || (items > 9))
             throw new IllegalArgumentException("Items must be between 1-9 (" + items + ")");
         switch (items) {
@@ -144,7 +174,7 @@ public class ItemManager {
         return null;
     }
 
-    public static Set<LobbyItem> getItems() {
+    public List<LobbyItem> getItems() {
         return items;
     }
 

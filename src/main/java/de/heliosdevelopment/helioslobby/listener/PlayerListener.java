@@ -31,12 +31,14 @@ import de.heliosdevelopment.helioslobby.player.PlayerManager;
 
 public class PlayerListener implements Listener {
 
+	private final ItemManager itemManager = new ItemManager();
+
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		event.setJoinMessage(null);
-		ItemManager.clearInventory(player);
-		ItemManager.getItems(player);
+		itemManager.clearInventory(player);
+		itemManager.getItems(player);
 		ScoreboardManager.updateScoreboard(player);
 		PlayerManager.loadPlayer(player);
 		if (!Lobby.getInstance().isSilentLobby()) {
@@ -104,8 +106,8 @@ public class PlayerListener implements Listener {
 		Location spawn = NavigatorManager.getItem("spawn").getLocation();
 		if (spawn != null)
 			player.teleport(spawn);
-		ItemManager.clearInventory(player);
-		ItemManager.getItems(player);
+		itemManager.clearInventory(player);
+		itemManager.getItems(player);
 	}
 
 	@EventHandler
@@ -126,7 +128,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-			LobbyItem item = ItemManager.getItem(e.getItem().getItemMeta().getDisplayName());
+			LobbyItem item = itemManager.getItem(e.getItem().getItemMeta().getDisplayName());
 			if (item != null)
 				item.onInteract(player);
 		}

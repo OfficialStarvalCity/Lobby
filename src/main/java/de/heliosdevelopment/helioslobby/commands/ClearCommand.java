@@ -8,13 +8,15 @@ import de.heliosdevelopment.helioslobby.item.ItemManager;
 
 public class ClearCommand extends LobbyCommand {
 
+	private final ItemManager itemManager = new ItemManager();
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if ((sender instanceof Player)) {
 			if (args.length == 0) {
 				Player p = (Player) sender;
-				ItemManager.clearInventory(p);
-				ItemManager.getItems(p);
+				itemManager.clearInventory(p);
+				itemManager.getItems(p);
 				p.sendMessage(prefix + "§7Du hast dein Inventar geleert.");
 			}
 		} else {

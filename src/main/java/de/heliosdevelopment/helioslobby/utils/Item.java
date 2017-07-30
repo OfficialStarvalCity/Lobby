@@ -139,8 +139,7 @@ public class Item {
 	 *            Add to the lore of the item
 	 */
 	public void addLore(List<String> lore) {
-		for (String s : lore)
-			l.add(s);
+        l.addAll(lore);
 	}
 
 	/**
