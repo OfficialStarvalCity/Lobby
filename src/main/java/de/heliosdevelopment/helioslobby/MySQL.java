@@ -1,26 +1,24 @@
 package de.heliosdevelopment.helioslobby;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import de.heliosdevelopment.sqlconnector.SQLClient;
-import de.heliosdevelopment.sqlconnector.SQLInfo;
+import de.heliosdevelopment.helioslobby.friends.FriendPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import de.heliosdevelopment.helioslobby.player.LobbyPlayer;
 import de.heliosdevelopment.helioslobby.player.Visibility;
+import org.bukkit.entity.Player;
 
 public class MySQL {
 
-    // private final SQLClient client;
+    //private final SQLClient client;
     private Connection connection;
 
-    public MySQL() throws Exception {
-        /*SQLInfo sqlInfo = new SQLInfo(
-                "127.0.0.1", 3306, "lobby", "root", "1v5z6j7c");
+    MySQL() throws Exception {
+       /* SQLInfo sqlInfo = new SQLInfo(
+                "localhost", 3306, "lobby", "root", "1v5z6j7c");
         this.client = new SQLClient(sqlInfo, "com.mysql.jdbc.Driver", "jdbc:mysql", 1);*/
         connect();
         createTable();
@@ -31,7 +29,7 @@ public class MySQL {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(
-                    "jdbc:mysql://127.0.0.1:3306/lobby?autoReconnect=true", "root", "1v5z6j7c");
+                    "jdbc:mysql://127.0.0.1:3306/bungee?autoReconnect=true", "root", "1v5z6j7c");
         } catch (ClassNotFoundException e) {
             System.out.println("Lobby Treiber nicht gefunden");
         } catch (SQLException e) {
@@ -45,7 +43,7 @@ public class MySQL {
 
     public void close() {
         try {
-            // client.getConnection().close();
+            // client.doShutdown();
             connection.close();
         } catch (SQLException e) {
             System.out.println("Lobby Fehler: " + e.getMessage());
@@ -71,15 +69,16 @@ public class MySQL {
                 + "  `z` double NOT NULL, `yaw` float NOT NULL, `pitch` float NOT NULL)"
                 + " ENGINE=InnoDB DEFAULT CHARSET=latin1;");
 
-        updateSQL("CREATE TABLE IF NOT EXISTS `players` ( `uuid` VARCHAR(99) NOT NULL,\n"
-                + "  `visibility` VARCHAR(20) NOT NULL)"
+        updateSQL("CREATE TABLE IF NOT EXISTS `players` ( `uuid` VARCHAR(99) NOT NULL, `name` VARCHAR(30) NOT NULL, \n"
+                + "  `visibility` VARCHAR(20) NOT NULL, `cosmetics` text NOT NULL, `lastDailyReward` VARCHAR(99) NOT NULL, `lastPremiumReward` VARCHAR(99) NOT NULL)"
                 + " ENGINE=InnoDB DEFAULT CHARSET=latin1;");
 
 
     }
 
     private void updateSQL(String statment) {
-        //try (Connection connection = client.getConnection()) {
+        // try {
+        //   Connection connection = client.getConnection();
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate(statment);
@@ -89,7 +88,8 @@ public class MySQL {
     }
 
     private ResultSet select(String statement) {
-        //try (Connection connection = client.getConnection()) {
+        //  try {
+        // Connection connection = client.getConnection();
         try {
             Statement query = connection.createStatement();
             return query.executeQuery(statement);
@@ -104,7 +104,7 @@ public class MySQL {
         ResultSet result = select("SELECT * FROM `locations` WHERE `name` = '" + name + "'");
         Location loc = null;
         if (result == null) {
-            return loc;
+            return null;
         }
 
         try {
@@ -128,12 +128,20 @@ public class MySQL {
         ResultSet result = select("SELECT * FROM `players` WHERE `uuid` = '" + uuid + "'");
         LobbyPlayer player = null;
         if (result == null) {
-            return player;
+            return null;
         }
 
         try {
             while (result.next()) {
-                player = new LobbyPlayer(UUID.fromString(result.getString("uuid")), Visibility.valueOf(result.getString("visibility")));
+                Set<Integer> cosmetics = new HashSet<>();
+                for (String s : result.getString("cosmetics").split(";")) {
+                    if (!s.equals(""))
+                        cosmetics.add(Integer.valueOf(s));
+                }
+                player = new LobbyPlayer(UUID.fromString(result.getString("uuid")),
+                        result.getString("name"), Visibility.valueOf(result.getString("visibility")),
+                        cosmetics, Long.valueOf(result.getString("lastDailyReward")),
+                        Long.valueOf(result.getString("lastPremiumReward")));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -142,20 +150,32 @@ public class MySQL {
 
     }
 
-    public void addPlayer(String uuid, Visibility visibility) {
+    public void addPlayer(String uuid, String name, Visibility visibility, Set<Integer> cosmetics, long lastDailyReward, long lastPremiumReward) {
+        StringBuilder cosmeticString = new StringBuilder();
+        for (Integer cosmeticInteger : cosmetics)
+            cosmeticString.append(cosmeticInteger.toString()).append(";");
         if (getLobbyPlayer(uuid) != null) {
-            updateSQL("UPDATE `players` SET `visibility`='" + visibility.toString() + "' WHERE `uuid`='" + uuid + "'");
+            updateSQL("UPDATE `players` SET `name`='" + name + "', `visibility`='" + visibility.toString() + "', `cosmetics`='" + cosmeticString + "', `lastDailyReward`='" + String.valueOf(lastDailyReward) + "', `lastPremiumReward`='" + String.valueOf(lastPremiumReward) + "' WHERE `uuid`='" + uuid + "'");
+
         } else {
-            updateSQL("INSERT INTO `players` (`uuid`, `visibility`) VALUES ('" + uuid
-                    + "', '" + visibility.toString() + "')");
+            updateSQL("INSERT INTO `players` (`uuid`, `name`, `visibility`, `cosmetics`, `lastDailyReward`, 'lastPremiumReward`) VALUES ('" + uuid + "', '" + name
+                    + "', '" + visibility.toString() + "', '" + cosmeticString + "', '" + String.valueOf(lastDailyReward) + "')");
         }
+    }
+
+    public UUID getUuid(String name) {
+        return null;
+    }
+
+    public String getPlayerName(UUID uuid) {
+        return null;
     }
 
     public Location getLocation(String uuid) {
         ResultSet result = select("SELECT * FROM `playerLocation` WHERE `uuid` = '" + uuid + "'");
         Location loc = null;
         if (result == null) {
-            return loc;
+            return null;
         }
 
         try {
@@ -232,5 +252,44 @@ public class MySQL {
             System.out.println(e.getMessage());
         }
         return cosmetics;
+    }
+
+    public FriendPlayer getFriendPlayer(Player player) {
+        ResultSet result = select("SELECT `playerFriends` FROM `friends` WHERE `uuid` = '" + player.getUniqueId() + "'");
+        List<Object> cosmetics = new ArrayList<>();
+        if (result == null) {
+            return null;
+        }
+        try {
+            if (result.next()) {
+                List<String> friends = new ArrayList<>();
+                String friendsResult = result.getString("playerFriends");
+                if (friendsResult != null)
+                    for (String s : friendsResult.split(";"))
+                        friends.add(getName(UUID.fromString(s)));
+
+                return new FriendPlayer(player, friends);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+
+    }
+
+    public String getName(UUID uuid) {
+        ResultSet result = select("SELECT `name` FROM `friends` WHERE `uuid` = '" + uuid.toString() + "'");
+        if (result == null) {
+            return null;
+        }
+
+        try {
+            result.next();
+            return result.getString("name");
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        }
+        return null;
     }
 }
