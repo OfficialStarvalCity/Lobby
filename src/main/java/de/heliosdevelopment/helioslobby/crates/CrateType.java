@@ -5,5 +5,5 @@ package de.heliosdevelopment.helioslobby.crates;
  */
 public enum CrateType {
 
-    PET,HEAD,PARTICLE,COINS
+    COSMETIC,COINS
 }

@@ -13,36 +13,36 @@ public abstract class CosmeticItem {
 	private final int id;
 	private final String name;
 	private final CosmeticType type;
-	private final int requeredLevel;
+	private final int price;
 	private final Material material;
 	private final int data;
 	private final Color color;
 
-	public CosmeticItem(String name, CosmeticType type, Material mat, int requeredLevel) {
+	public CosmeticItem(String name, CosmeticType type, Material mat, int price) {
 		this.id = CosmeticManager.getNextId();
 		this.name = name;
 		this.type = type;
-		this.requeredLevel = requeredLevel;
+		this.price = price;
 		this.material = mat;
 		this.data = 0;
 		this.color = null;
 	}
 
-	public CosmeticItem(String name, CosmeticType type, Material mat, int requeredLevel, int data) {
+	public CosmeticItem(String name, CosmeticType type, Material mat, int price, int data) {
 		this.id = CosmeticManager.getNextId();
 		this.name = name;
 		this.type = type;
-		this.requeredLevel = requeredLevel;
+		this.price = price;
 		this.material = mat;
 		this.data = data;
 		this.color = null;
 	}
 
-	public CosmeticItem(String name, CosmeticType type, Material mat, int requeredLevel, Color color) {
+	public CosmeticItem(String name, CosmeticType type, Material mat, int price, Color color) {
 		this.id = CosmeticManager.getNextId();
 		this.name = name;
 		this.type = type;
-		this.requeredLevel = requeredLevel;
+		this.price = price;
 		this.material = mat;
 		this.data = 0;
 		this.color = color;
@@ -56,8 +56,8 @@ public abstract class CosmeticItem {
 		return type;
 	}
 
-	public int getRequeredLevel() {
-		return requeredLevel;
+	public int getPrice() {
+		return price;
 	}
 
 	public Material getMaterial() {
@@ -72,7 +72,7 @@ public abstract class CosmeticItem {
 		return id;
 	}
 
-	public ItemStack getItem(int level, boolean hasPermission) {
+	public ItemStack getItem(boolean hasItem, boolean hasPermission) {
 		Item i = new Item(material, 1, data);
 		i.setName("§6" + name);
 		if (type == CosmeticType.HATS && material.equals(Material.SKULL_ITEM)) {
@@ -81,11 +81,11 @@ public abstract class CosmeticItem {
 		}
 		if (type == CosmeticType.ARMOR && color != null)
 			i.setLeatherColor(color);
-		if (level >= requeredLevel || hasPermission) {
+		if (hasItem || hasPermission) {
 			i.addLore("", "§aFreigeschaltet");
 			i.addEnchantment(Enchantment.KNOCKBACK, 1);
 		} else
-			i.addLore("", "§cBenötigtes Level §7" + requeredLevel);
+			i.addLore("", "§cKosten §7" + price);
 		i.hideFlags();
 		return i.getItem();
 

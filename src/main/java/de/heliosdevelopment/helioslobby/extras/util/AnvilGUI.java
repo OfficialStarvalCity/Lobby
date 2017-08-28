@@ -40,7 +40,7 @@ public class AnvilGUI {
 
 		private final int slot;
 
-		private AnvilSlot(int slot) {
+		AnvilSlot(int slot) {
 			this.slot = slot;
 		}
 
@@ -98,7 +98,7 @@ public class AnvilGUI {
 	}
 
 	public interface AnvilClickEventHandler {
-		public void onAnvilClick(AnvilClickEvent event);
+		void onAnvilClick(AnvilClickEvent event);
 	}
 
 	private Player player;

@@ -1,8 +1,6 @@
 package de.heliosdevelopment.helioslobby.crates;
 
 
-import org.bukkit.inventory.ItemStack;
-
 /**
  * Created by Teeage on 29.07.2017.
  */
@@ -36,9 +34,5 @@ public class Crate {
 
     public int getAmount() {
         return amount;
-    }
-
-    public ItemStack getItem(){
-        return null;
     }
 }

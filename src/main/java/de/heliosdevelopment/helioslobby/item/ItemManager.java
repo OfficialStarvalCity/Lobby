@@ -5,10 +5,13 @@ import java.io.DataOutputStream;
 import java.util.*;
 
 import de.heliosdevelopment.helioscore.HeliosCore;
+import de.heliosdevelopment.helioslobby.friends.FriendManager;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.Dye;
 
 import de.heliosdevelopment.helioslobby.Lobby;
@@ -23,14 +26,14 @@ public class ItemManager {
     private final static HeliosCore core = HeliosCore.getInstance();
     private final static List<Player> cooldown = new ArrayList<>();
 
-    public ItemManager() {
-        items.add(new LobbyItem("§7× §eNavigator §7×", Material.COMPASS, "", null, null) {
+    public ItemManager(FriendManager friendManager) {
+        items.add(new LobbyItem("§7× §eNavigator §7×", Material.RECORD_5, "", null, null) {
             @Override
             public void onInteract(Player player) {
                 NavigatorManager.openNavigator(player);
             }
         });
-        items.add(new LobbyItem("§7× §eExtras §7×", Material.EMERALD, "", null, null) {
+        items.add(new LobbyItem("§7× §eExtras §7×", Material.CHEST, "", null, null) {
             @Override
             public void onInteract(Player player) {
                 if (Lobby.getInstance().isSilentLobby()) {
@@ -102,13 +105,19 @@ public class ItemManager {
                 player.sendPluginMessage(Lobby.getInstance(), "BungeeCord", b.toByteArray());
             }
         });
+        items.add(new LobbyItem("§7× §eFreunde §7×", Material.SKULL_ITEM, "", null, null) {
+            @Override
+            public void onInteract(Player player) {
+                friendManager.openFriendInventory(player);
+            }
+        });
     }
 
     public void getItems(Player player) {
 
         final List<LobbyItem> list = new ArrayList<>();
         for (LobbyItem item : items) {
-            if (item.getPermission() != null || item.getPermission() != "") {
+            if (!Objects.equals(item.getPermission(), "")) {
                 if (player.hasPermission(item.getPermission())) {
                     list.add(item);
                 }
@@ -116,10 +125,16 @@ public class ItemManager {
                 list.add(item);
             }
         }
+
         int[] position = getPosition(list.size());
         for (int i = 0; i < list.size(); i++) {
-            assert position != null;
-            player.getInventory().setItem(position[i], list.get(i).getItem());
+            ItemStack item = list.get(i).getItem();
+            if (item.getType() == Material.SKULL_ITEM) {
+                SkullMeta meta = (SkullMeta) item.getItemMeta();
+                meta.setOwner(player.getName());
+                item.setItemMeta(meta);
+            }
+            player.getInventory().setItem(position != null ? position[i] : 0, item);
         }
     }
 

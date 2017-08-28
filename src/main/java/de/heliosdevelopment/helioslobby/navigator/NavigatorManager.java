@@ -14,11 +14,10 @@ import org.bukkit.inventory.Inventory;
 import de.heliosdevelopment.helioslobby.Lobby;
 import de.heliosdevelopment.helioslobby.MySQL;
 import de.heliosdevelopment.helioslobby.utils.ItemCreator;
-import org.yaml.snakeyaml.Yaml;
 
 public class NavigatorManager {
 
-    private final static Inventory inventory = Bukkit.createInventory(null, 27, "§eNavigator");
+    private final static Inventory inventory = Bukkit.createInventory(null, 45, "§eNavigator");
     private final static List<NavigatorItem> items = new ArrayList<>();
     private final static MySQL mysql = Lobby.getInstance().getMysql();
     private final static File file = new File(Lobby.getInstance().getDataFolder() + "//navigator.yml");

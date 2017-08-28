@@ -1,14 +1,16 @@
 package de.heliosdevelopment.helioslobby.extras;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+import de.heliosdevelopment.helioslobby.player.LobbyPlayer;
+import de.heliosdevelopment.helioslobby.player.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Dye;
@@ -33,6 +35,7 @@ public class CosmeticManager {
 	private static final List<CosmeticItem> cosmetics = new ArrayList<>();
 	private static final int[] positions = new int[] { 10, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 30, 31, 32 };
 	private static int idCounter = 0;
+	private static Map<Player, Integer> inBuying = new HashMap<>();
 
 	public static void init() {
 		// Heads
@@ -122,6 +125,10 @@ public class CosmeticManager {
 		// }
 		// }
 
+		LobbyPlayer lobbyPlayer= PlayerManager.getPlayer(p);
+		if(lobbyPlayer==null)return;
+
+
 		Inventory inv = Bukkit.createInventory(null, 45, "§7Cosmetics");
 
 		Item pane = new Item(Material.STAINED_GLASS_PANE, 1, 7);
@@ -132,10 +139,11 @@ public class CosmeticManager {
 		final int level = 100;
 		final boolean hasPermission = p.hasPermission("lobby.unlockall");
 		for (int i = 0; i < temp.size(); i++) {
+			boolean hasItem = lobbyPlayer.getCosmetics().contains(temp.get(i).getId());
 			if (type == CosmeticType.PETS)
-				inv.setItem((positions[i + 7]) - 9, temp.get(i).getItem(level, hasPermission));
+				inv.setItem((positions[i + 7]) - 9, temp.get(i).getItem(hasItem, hasPermission));
 			else
-				inv.setItem(positions[i], temp.get(i).getItem(level, hasPermission));
+				inv.setItem(positions[i], temp.get(i).getItem(hasItem, hasPermission));
 		}
 		new ItemCreator(Material.SKULL_ITEM, 1).durability(3).setSkullOwner("MHF_ArrowLeft").setName("§7Zurück")
 				.setSlot(inv, inv.getSize() - 1);
@@ -247,7 +255,7 @@ public class CosmeticManager {
 					return ci;
 			}
 		}
-		if (name.contains("'s Kopf"))
+		if (name != null && name.contains("'s Kopf"))
 			name = name.replace("'s Kopf", "");
 		for (CosmeticItem ci : cosmetics) {
 			if (ci.getMaterial() == mat && ci.getName().equalsIgnoreCase(name))
@@ -268,6 +276,18 @@ public class CosmeticManager {
 			}
 		}
 		return temp;
+	}
+
+	public static void openBuyingInventory(Player player, int cosmeticId){
+		Inventory inventory = Bukkit.createInventory(null, InventoryType.HOPPER, "§e");
+		CosmeticItem cosmeticItem = getCosmeticItem(cosmeticId);
+		if(cosmeticItem == null)return;
+		ItemStack cosmetic = cosmeticItem.getItem(false, false);
+		Item accept = new Item(Material.WOOL, 1, 5);
+		Item deny = new Item(Material.WOOL, 1, 14);
+		accept.setName("§");
+
+
 	}
 
 	public static void openColorInventory(Player player) {
@@ -315,11 +335,11 @@ public class CosmeticManager {
 		}
 	}
 
-	public static void equitItems(Player player) {
+	public static void equipItems(Player player) {
 		if (player != null) {
 			List<Object> cosmetics = Lobby.getInstance().getMysql().getCosmetics(player.getUniqueId().toString());
 			if (cosmetics.size() != 5) {
-				System.out.println("CosmeticManager/equitItemsNot/enough Items");
+				System.out.println("CosmeticManager/equitItems/Not enough items");
 				for (Object o : cosmetics)
 					System.out.println(o.toString());
 				return;
@@ -329,8 +349,8 @@ public class CosmeticManager {
 					&& !cosmetics.get(1).toString().equalsIgnoreCase("-31")
 					&& Integer.valueOf(cosmetics.get(2).toString()) != -1) {
 				PetManager.addPet(player, new Pet(player,
-						((PetCosmetic) CosmeticManager.getCosmeticItem(Integer.valueOf(cosmetics.get(0).toString())))
-								.getEntityType(),
+						((PetCosmetic) CosmeticManager.getCosmeticItem(Integer.valueOf(cosmetics.get(0).toString()))) != null ? ((PetCosmetic) CosmeticManager.getCosmeticItem(Integer.valueOf(cosmetics.get(0).toString())))
+								.getEntityType() : null,
 						cosmetics.get(1).toString().replace("_", " "),
 						Integer.valueOf(decode(cosmetics.get(2).toString()))));
 			}
@@ -360,4 +380,7 @@ public class CosmeticManager {
 		return name;
 	}
 
+	public static List<CosmeticItem> getCosmetics() {
+		return cosmetics;
+	}
 }

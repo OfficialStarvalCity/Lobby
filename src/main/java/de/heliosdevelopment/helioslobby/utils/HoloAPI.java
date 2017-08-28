@@ -171,7 +171,7 @@ public class HoloAPI {
 			Method setInvisible = entityObject.getClass().getMethod("setInvisible", boolean.class);
 			setInvisible.invoke(entityObject, true);
 			Constructor<?> cw = packetClass.getConstructor(entityLivingClass);
-            return cw.newInstance(new Object[] { entityObject });
+            return cw.newInstance(entityObject);
 		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();

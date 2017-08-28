@@ -1,5 +1,6 @@
 package de.heliosdevelopment.helioslobby.commands;
 
+import de.heliosdevelopment.helioslobby.Lobby;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -8,7 +9,7 @@ import de.heliosdevelopment.helioslobby.item.ItemManager;
 
 public class ClearCommand extends LobbyCommand {
 
-	private final ItemManager itemManager = new ItemManager();
+	private final ItemManager itemManager = new ItemManager(Lobby.getInstance().getFriendManager());
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

@@ -31,7 +31,7 @@ import de.heliosdevelopment.helioslobby.player.PlayerManager;
 
 public class PlayerListener implements Listener {
 
-	private final ItemManager itemManager = new ItemManager();
+	private final ItemManager itemManager = new ItemManager(Lobby.getInstance().getFriendManager());
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
@@ -42,7 +42,7 @@ public class PlayerListener implements Listener {
 		ScoreboardManager.updateScoreboard(player);
 		PlayerManager.loadPlayer(player);
 		if (!Lobby.getInstance().isSilentLobby()) {
-			CosmeticManager.equitItems(player);
+			CosmeticManager.equipItems(player);
 			player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 1.0F);
 		}
 		if (player.hasPermission("lobby.firework") && !Lobby.getInstance().isSilentLobby())
