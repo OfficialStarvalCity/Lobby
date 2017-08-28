@@ -85,7 +85,7 @@ public class Lobby extends JavaPlugin {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerManager.loadPlayer(player);
-            CosmeticManager.equitItems(player);
+            CosmeticManager.equipItems(player);
             friendManager.addPlayer(player);
         }
     }

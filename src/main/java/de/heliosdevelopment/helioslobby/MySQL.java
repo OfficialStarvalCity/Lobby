@@ -158,8 +158,8 @@ public class MySQL {
             updateSQL("UPDATE `players` SET `name`='" + name + "', `visibility`='" + visibility.toString() + "', `cosmetics`='" + cosmeticString + "', `lastDailyReward`='" + String.valueOf(lastDailyReward) + "', `lastPremiumReward`='" + String.valueOf(lastPremiumReward) + "' WHERE `uuid`='" + uuid + "'");
 
         } else {
-            updateSQL("INSERT INTO `players` (`uuid`, `name`, `visibility`, `cosmetics`, `lastDailyReward`, 'lastPremiumReward`) VALUES ('" + uuid + "', '" + name
-                    + "', '" + visibility.toString() + "', '" + cosmeticString + "', '" + String.valueOf(lastDailyReward) + "')");
+            updateSQL("INSERT INTO `players` (`uuid`, `name`, `visibility`, `cosmetics`, `lastDailyReward`, `lastPremiumReward`) VALUES ('" + uuid + "', '" + name
+                    + "', '" + visibility.toString() + "', '" + cosmeticString + "', '" + String.valueOf(lastDailyReward) + "', '" + String.valueOf(lastPremiumReward) + "')");
         }
     }
 

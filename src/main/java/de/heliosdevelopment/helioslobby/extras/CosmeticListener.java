@@ -2,6 +2,7 @@ package de.heliosdevelopment.helioslobby.extras;
 
 import de.heliosdevelopment.helioslobby.player.LobbyPlayer;
 import de.heliosdevelopment.helioslobby.player.PlayerManager;
+import de.heliosdevelopment.helioslobby.utils.ActionBar;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -46,8 +47,10 @@ public class CosmeticListener implements Listener {
                 if (lobbyPlayer.getCosmetics().contains(cosmetic.getId())
                         || p.hasPermission("lobby.unlockall"))
                     cosmetic.equipItem(p);
-                else
-                    p.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu hast nicht genug Level!");
+                else {
+                    CosmeticManager.getInBuying().put(p, cosmetic.getId());
+                    CosmeticManager.openBuyingInventory(p, cosmetic.getId());
+                }
 
             } else {
                 switch (ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName())) {
@@ -175,6 +178,23 @@ public class CosmeticListener implements Listener {
                 sheep.setColor(color);
                 p.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Dein Haustier hat nun die Farbe §e" + color.name());
             }
+        } else if (event.getInventory().getName().equalsIgnoreCase("§eKaufen")) {
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equals("§aKaufen")) {
+                //TODO POINTS
+                Integer id = CosmeticManager.getInBuying().get(p);
+                if (id == null) return;
+                LobbyPlayer lobbyPlayer = PlayerManager.getPlayer(p);
+                if (lobbyPlayer == null) return;
+                if (!lobbyPlayer.getCosmetics().contains(id))
+                    lobbyPlayer.getCosmetics().add(id);
+                p.closeInventory();
+                ActionBar.sendActionBar(p, Lobby.getInstance().getChatManager().getMessage("prefix") + "§aDu hast dir erfolgreich ein neues Extra gekauft.");
+            } else if (event.getCurrentItem().getItemMeta().getDisplayName().equals("§cAbbrechen")) {
+                CosmeticManager.getInBuying().remove(p);
+                CosmeticManager.openMainInventory(p);
+            }
+            event.setCancelled(true);
+
         }
     }
 
