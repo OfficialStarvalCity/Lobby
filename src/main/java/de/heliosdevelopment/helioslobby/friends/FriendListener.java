@@ -49,7 +49,7 @@ public class FriendListener implements Listener {
             if(currentItem.getType() == Material.LAVA_BUCKET)
                 friendManager.getClass();
                 //Destroy Friendship(Name = currentItem.getItemMeta().getDisplayName())
-            else if(currentItem.getType() == Material.WOODEN_DOOR)
+            else if(currentItem.getType() == Material.WOOD_DOOR)
                 friendManager.openFriendInventory(player);
 
         }

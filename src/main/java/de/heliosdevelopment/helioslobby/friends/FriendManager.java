@@ -71,7 +71,7 @@ public class FriendManager {
     }
 
     public void openPlayerInventory(Player player, String name) {
-        Inventory inventory = Bukkit.createInventory(null, 36, "§eFreunde §8» §7Infos");
+        Inventory inventory = Bukkit.createInventory(null, 27, "§eFreunde §8» §7Infos");
         FriendPlayer friendPlayer = getPlayer(player);
         if(friendPlayer == null) return;
         for(int i = 0; i < inventory.getSize(); i++) new ItemCreator(Material.STAINED_GLASS_PANE, 1).durability(7).hideFlags().setName("§1").setSlot(inventory, i);
@@ -83,7 +83,7 @@ public class FriendManager {
         item.setName(name);
         inventory.setItem(13, item.getItem());
 
-        new ItemCreator(Material.WOODEN_DOOR, 1).setName("§cZurück").setSlot(inventory, 16);
+        new ItemCreator(Material.WOOD_DOOR, 1).setName("§cZurück").setSlot(inventory, 16);
 
         player.openInventory(inventory);
     }
