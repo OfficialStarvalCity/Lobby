@@ -54,22 +54,37 @@ public class FriendManager {
     }
 
     public void openFriendInventory(Player player) {
-        Inventory inventory = Bukkit.createInventory(null, 45, "§eFreunde");
+        Inventory inventory = Bukkit.createInventory(null, 45, "§eFreunde §8» §7Menü");
         FriendPlayer friendPlayer = getPlayer(player);
-        if (friendPlayer == null)
-            return;
-        for (Integer i = 0; i < inventory.getSize(); i++) {
-            new ItemCreator(Material.STAINED_GLASS_PANE, 1).durability(7).hideFlags().setName("§1").setSlot(inventory,
-                    i);
-        }
+        if (friendPlayer == null) return;
+        for (Integer i = 0; i < inventory.getSize(); i++) new ItemCreator(Material.STAINED_GLASS_PANE, 1).durability(7).hideFlags().setName("§1").setSlot(inventory, i);
+
         for (int i = 0; i < friendPlayer.getFriends().size(); i++) {
-            System.out.println("cool party");
             Item item = new Item(Material.SKULL_ITEM, 1, 3);
             String name = friendPlayer.getFriends().get(i);
             item.setSkullOwner(name);
             item.setName("§a" + name);
             inventory.setItem(fields[i], item.getItem());
         }
+
+        player.openInventory(inventory);
+    }
+
+    public void openPlayerInventory(Player player, String name) {
+        Inventory inventory = Bukkit.createInventory(null, 36, "§eFreunde §8» §7Infos");
+        FriendPlayer friendPlayer = getPlayer(player);
+        if(friendPlayer == null) return;
+        for(int i = 0; i < inventory.getSize(); i++) new ItemCreator(Material.STAINED_GLASS_PANE, 1).durability(7).hideFlags().setName("§1").setSlot(inventory, i);
+
+
+        new ItemCreator(Material.LAVA_BUCKET, 1).setName("§cFreundschaft beenden").setSlot(inventory, 10);
+        Item item = new Item(Material.SKULL_ITEM, 1, 3);
+        item.setSkullOwner(name);
+        item.setName(name);
+        inventory.setItem(13, item.getItem());
+
+        new ItemCreator(Material.WOODEN_DOOR, 1).setName("§cZurück").setSlot(inventory, 16);
+
         player.openInventory(inventory);
     }
 
