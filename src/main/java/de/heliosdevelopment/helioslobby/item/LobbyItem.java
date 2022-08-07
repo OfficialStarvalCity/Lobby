@@ -11,12 +11,12 @@ import de.heliosdevelopment.helioslobby.utils.Item;
 
 public abstract class LobbyItem {
 
-    private final String name;
+    private String name;
     private final Material material;
     private final String permission;
     private final List<String> lore;
     private final List<String> alias;
-    private final Dye dye;
+    private Dye dye;
 
     public LobbyItem(String name, Material material, String permission, List<String> lore, List<String> alias) {
         this(name, material, permission, lore, alias, null);
@@ -50,7 +50,7 @@ public abstract class LobbyItem {
 
     public ItemStack getItem() {
         Item item;
-        if (material == Material.SKULL_ITEM)
+        if (material == Material.PLAYER_HEAD)
             item = new Item(material, 1, 3);
         else if (dye != null)
             item = new Item(dye);
@@ -68,4 +68,15 @@ public abstract class LobbyItem {
 
     public abstract void onInteract(Player player);
 
+    public Dye getDye() {
+        return dye;
+    }
+
+    public void setDye(Dye dye) {
+        this.dye = dye;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

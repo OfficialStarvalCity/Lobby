@@ -1,9 +1,8 @@
-name: HeliosLobby
+name: Lobby
 author: Teeage
-version: 1.0
+version: ${project.version}
 main: de.heliosdevelopment.helioslobby.Lobby
-website: teeage.de
-softdepend: [HeliosCore]
+softdepend: [HeliosCore, heliosperms, HeliosPoints, Vault]
 commands:
   clearchat:
   clear:
@@ -11,3 +10,7 @@ commands:
   remove:
   set:
   vanish:
+  spawnwitch:
+  despawnwitch:
+  keys:
+  points:

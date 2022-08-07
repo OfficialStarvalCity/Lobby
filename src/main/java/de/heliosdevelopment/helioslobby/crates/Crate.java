@@ -10,14 +10,16 @@ public class Crate {
     private final CrateType type;
     private int cosmeticId;
     private int amount;
+    private String description;
 
-    public Crate(String name, CrateType type, int i){
+    public Crate(String name, CrateType type, int i, String description) {
         this.name = name;
         this.type = type;
-        if(type == CrateType.COINS)
+        if (type == CrateType.COINS)
             this.amount = i;
         else
             this.cosmeticId = i;
+        this.description = description;
     }
 
     public String getName() {
@@ -34,5 +36,9 @@ public class Crate {
 
     public int getAmount() {
         return amount;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

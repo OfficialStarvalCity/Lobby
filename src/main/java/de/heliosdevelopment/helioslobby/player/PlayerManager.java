@@ -17,14 +17,14 @@ public class PlayerManager {
     public static void loadPlayer(Player player) {
         LobbyPlayer lobbyPlayer = mysql.getLobbyPlayer(player.getUniqueId().toString());
         if (lobbyPlayer == null)
-            lobbyPlayer = new LobbyPlayer(player.getUniqueId(), player.getName(), Visibility.ALL, new HashSet<>(), 0, 0);
+            lobbyPlayer = new LobbyPlayer(player.getUniqueId(), player.getName(), Visibility.ALL, new HashSet<>(), 0, 0, 0);
         players.add(lobbyPlayer);
     }
 
     public static void unloadPlayer(Player player) {
         LobbyPlayer lobbyPlayer = getPlayer(player);
         if (lobbyPlayer != null) {
-            mysql.addPlayer(lobbyPlayer.getUuid().toString(), lobbyPlayer.getName(), lobbyPlayer.getVisibility(), lobbyPlayer.getCosmetics(), lobbyPlayer.getLastDailyReward(), lobbyPlayer.getLastPremiumReward());
+            mysql.addPlayer(lobbyPlayer.getUuid().toString(), lobbyPlayer.getName(), lobbyPlayer.getVisibility(), lobbyPlayer.getCosmetics(), lobbyPlayer.getLastDailyReward(), lobbyPlayer.getLastPremiumReward(), lobbyPlayer.getKeys());
         }
     }
 

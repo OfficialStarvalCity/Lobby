@@ -4,8 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.*;
 
-import de.heliosdevelopment.helioscore.HeliosCore;
 import de.heliosdevelopment.helioslobby.friends.FriendManager;
+import de.heliosdevelopment.helioslobby.manager.SettingManager;
+import de.heliosdevelopment.helioslobby.player.LobbyPlayer;
+import de.heliosdevelopment.helioslobby.player.PlayerManager;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -23,94 +25,100 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class ItemManager {
 
     private final List<LobbyItem> items = new ArrayList<>();
-    private final static HeliosCore core = HeliosCore.getInstance();
     private final static List<Player> cooldown = new ArrayList<>();
 
-    public ItemManager(FriendManager friendManager) {
-        items.add(new LobbyItem("§7× §eNavigator §7×", Material.RECORD_5, "", null, null) {
+    public ItemManager(FriendManager friendManager, String defaulLobby, String silentLobby) {
+        items.add(new LobbyItem("§7× §eNavigator §7×", Material.LEGACY_RECORD_4, "", null, null) {
             @Override
             public void onInteract(Player player) {
                 NavigatorManager.openNavigator(player);
             }
         });
-        items.add(new LobbyItem("§7× §eExtras §7×", Material.CHEST, "", null, null) {
-            @Override
-            public void onInteract(Player player) {
-                if (Lobby.getInstance().isSilentLobby()) {
-                    player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix")
-                            + "§cExtras sind in der SilentLobby nicht verfügbar!");
-                } else {
-                    CosmeticManager.openMainInventory(player);
-                }
-            }
-        });
-        items.add(new LobbyItem("§7× §eNick §7×", Material.NAME_TAG, "lobby.advanced", null, null) {
-            @Override
-            public void onInteract(Player player) {
-                if (!cooldown.contains(player)) {
-                    int nicked = core.getNicked(player);
-                    if (nicked == 0) {
-                        core.updateNick(player, 1);
-                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Du hast die Auto-Nick Funktion aktiviert.");
-                    } else if (nicked == -1) {
-                        core.insertNick(player);
-                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Du hast die Auto-Nick Funktion aktiviert.");
+        if (SettingManager.getSetting("extrasitem").isEnabled()) {
+            items.add(new LobbyItem("§7× §eExtras §7×", Material.CHEST, "", null, null) {
+                @Override
+                public void onInteract(Player player) {
+                    if (Lobby.getInstance().isSilentLobby()) {
+                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix")
+                                + "§cExtras sind in der SilentLobby nicht verfügbar!");
                     } else {
-                        core.updateNick(player, 0);
-                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Du hast die Auto-Nick Funktion deaktiviert.");
+                        CosmeticManager.openMainInventory(player);
                     }
-                    cooldown.add(player);
-                    new BukkitRunnable() {
-
-                        @Override
-                        public void run() {
-                            cooldown.remove(player);
+                }
+            });
+        }
+        if (SettingManager.getSetting("nickitem").isEnabled()) {
+            items.add(new LobbyItem("§7× §eNick §7×", Material.NAME_TAG, "lobby.advanced", null, null) {
+                @Override
+                public void onInteract(Player player) {
+                    if (!cooldown.contains(player)) {
+                        boolean nicked = core.isNicked(player);
+                        if (core.isNicked(player)) {
+                            core.updateNick(player, false);
+                            player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Du hast die Auto-Nick Funktion deaktiviert.");
+                        } else {
+                            core.updateNick(player, true);
+                            player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Du hast die Auto-Nick Funktion aktiviert.");
                         }
+                        cooldown.add(player);
+                        new BukkitRunnable() {
 
-                    }.runTaskLater(Lobby.getInstance(), 100);
-                } else {
-                    player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix")
-                            + "§cDu musst noch einige Sekunden warten, bis du diese Funktion wieder verwenden kannst.");
+                            @Override
+                            public void run() {
+                                cooldown.remove(player);
+                            }
+
+                        }.runTaskLater(Lobby.getInstance(), 100);
+                    } else {
+                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix")
+                                + "§cDu musst noch einige Sekunden warten, bis du diese Funktion wieder verwenden kannst.");
+                    }
                 }
-            }
-        });
-        Dye dye = new Dye();
-        dye.setColor(DyeColor.LIME);
-        items.add(new LobbyItem("§7× §eSpieler Verstecken §7×", Material.BLAZE_ROD, "", null,
-                Collections.singletonList("§7× §eSpieler anzeigen §7×"), dye) {
-            @Override
-            public void onInteract(Player player) {
-                HideManager.setVisibility(player, player.getItemInHand());
-            }
-        });
-        items.add(new LobbyItem(
-                Lobby.getInstance().isSilentLobby() ? "§7× §eNormale Lobby §7×" : "§7× §eSilent Hub §7×",
-                Lobby.getInstance().isSilentLobby() ? Material.FEATHER : Material.TNT, "lobby.advanced", null, null) {
-            @Override
-            public void onInteract(Player player) {
-                String server;
-                if (Lobby.getInstance().isSilentLobby())
-                    server = "Lobby-1";
-                else
-                    server = "SilentLobby-1";
-                ByteArrayOutputStream b = new ByteArrayOutputStream();
-                DataOutputStream out = new DataOutputStream(b);
-                try {
-                    out.writeUTF("Connect");
-                    out.writeUTF(server);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return;
+            });
+        }
+        if (SettingManager.getSetting("hideplayeritem").isEnabled()) {
+            Dye dye = new Dye();
+            dye.setColor(DyeColor.LIME);
+            items.add(new LobbyItem("§7× §eSpieler Verstecken §7×", Material.BLAZE_ROD, "", null,
+                    Arrays.asList("§7× §eSpieler anzeigen §7×", "§7× §eSpieler Verstecken §7×"), dye) {
+                @Override
+                public void onInteract(Player player) {
+                    HideManager.setVisibility(player, player.getItemInHand());
                 }
-                player.sendPluginMessage(Lobby.getInstance(), "BungeeCord", b.toByteArray());
-            }
-        });
-        items.add(new LobbyItem("§7× §eFreunde §7×", Material.SKULL_ITEM, "", null, null) {
-            @Override
-            public void onInteract(Player player) {
-                friendManager.openFriendInventory(player);
-            }
-        });
+            });
+        }
+        if (SettingManager.getSetting("silentlobbyitem").isEnabled()) {
+            items.add(new LobbyItem(
+                    Lobby.getInstance().isSilentLobby() ? "§7× §eNormale Lobby §7×" : "§7× §eSilent Hub §7×",
+                    Lobby.getInstance().isSilentLobby() ? Material.FEATHER : Material.TNT, "lobby.advanced", null, null) {
+                @Override
+                public void onInteract(Player player) {
+                    String server;
+                    if (Lobby.getInstance().isSilentLobby())
+                        server = defaulLobby;
+                    else
+                        server = silentLobby;
+                    ByteArrayOutputStream b = new ByteArrayOutputStream();
+                    DataOutputStream out = new DataOutputStream(b);
+                    try {
+                        out.writeUTF("Connect");
+                        out.writeUTF(server);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    player.sendPluginMessage(Lobby.getInstance(), "BungeeCord", b.toByteArray());
+                }
+            });
+        }
+        if (SettingManager.getSetting("friendsitem").isEnabled()) {
+            items.add(new LobbyItem("§7× §eFreunde §7×", Material.SKULL_ITEM, "", null, null) {
+                @Override
+                public void onInteract(Player player) {
+                    friendManager.openFriendInventory(player);
+                }
+            });
+        }
     }
 
     public void getItems(Player player) {
@@ -122,6 +130,23 @@ public class ItemManager {
                     list.add(item);
                 }
             } else {
+                if (item.getDye() != null) {
+                    LobbyPlayer lobbyPlayer = PlayerManager.getPlayer(player);
+                    if (lobbyPlayer != null) {
+                        switch (lobbyPlayer.getVisibility()) {
+                            case ALL:
+                                item.getDye().setColor(DyeColor.LIME);
+                                break;
+                            case NONE:
+                                item.getDye().setColor(DyeColor.GRAY);
+                                item.setName("§7× §eSpieler anzeigen §7×");
+                                break;
+                            case PREMIUM:
+                                item.getDye().setColor(DyeColor.PURPLE);
+                                break;
+                        }
+                    }
+                }
                 list.add(item);
             }
         }

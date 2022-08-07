@@ -3,9 +3,11 @@ package de.heliosdevelopment.helioslobby.crates;
 import de.heliosdevelopment.helioslobby.Lobby;
 import de.heliosdevelopment.helioslobby.extras.CosmeticItem;
 import de.heliosdevelopment.helioslobby.extras.CosmeticManager;
+import de.heliosdevelopment.helioslobby.manager.SoundManager;
 import de.heliosdevelopment.helioslobby.player.LobbyPlayer;
 import de.heliosdevelopment.helioslobby.player.PlayerManager;
 import de.heliosdevelopment.helioslobby.utils.HoloAPI;
+import de.heliosdevelopment.helioslobby.utils.PointsManager;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -30,14 +32,14 @@ public class CrateManager {
 
     public CrateManager() {
         for (CosmeticItem item : CosmeticManager.getCosmetics())
-            crates.add(new Crate(item.getName(), CrateType.COSMETIC, item.getId()));
-        crates.add(new Crate("50 Points", CrateType.COINS, 50));
-        crates.add(new Crate("100 Points", CrateType.COINS, 100));
-        crates.add(new Crate("200 Points", CrateType.COINS, 200));
-        crates.add(new Crate("400 Points", CrateType.COINS, 400));
-        crates.add(new Crate("600 Points", CrateType.COINS, 600));
-        crates.add(new Crate("800 Points", CrateType.COINS, 800));
-        crates.add(new Crate("1000 Points", CrateType.COINS, 1000));
+            crates.add(new Crate(item.getName(), CrateType.COSMETIC, item.getId(), item.getType().toString()));
+        crates.add(new Crate("50 Points", CrateType.COINS, 50, "POINTS"));
+        crates.add(new Crate("100 Points", CrateType.COINS, 100, "POINTS"));
+        crates.add(new Crate("200 Points", CrateType.COINS, 200, "POINTS"));
+        crates.add(new Crate("400 Points", CrateType.COINS, 400, "POINTS"));
+        crates.add(new Crate("600 Points", CrateType.COINS, 600, "POINTS"));
+        crates.add(new Crate("800 Points", CrateType.COINS, 800, "POINTS"));
+        crates.add(new Crate("1000 Points", CrateType.COINS, 1000, "POINTS"));
 
         File file = new File(Lobby.getInstance().getDataFolder() + "//crates.yml");
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
@@ -61,12 +63,6 @@ public class CrateManager {
     public void openCrate(Player player, CrateChest crateChest) {
         LobbyPlayer lobbyPlayer = PlayerManager.getPlayer(player);
         if (lobbyPlayer == null) return;
-        if (lobbyPlayer.getKeys() > 0)
-            lobbyPlayer.setKeys(lobbyPlayer.getKeys() - 1);
-        else {
-            player.sendMessage(prefix + "§cDu benötigst einen Schlüssel um diese Kiste zu öffnen!");
-            return;
-        }
         crateChest.setUsed(true);
         new BukkitRunnable() {
             int counter = 30;
@@ -76,17 +72,18 @@ public class CrateManager {
             @Override
             public void run() {
                 if (counter == 0) {
+                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
                     if (currentCrate.getType() == CrateType.COINS) {
-                        //TODO coins api set coins
-                        player.sendMessage(prefix + "Du hast Punkte erhalten.");
+                        PointsManager.addPoints(player, currentCrate.getAmount());
+                        player.sendMessage(prefix + "Du hast §e" + currentCrate.getAmount() + " §7Punkte erhalten.");
                     } else {
                         if (lobbyPlayer.getCosmetics().contains(currentCrate.getCosmeticId())) {
-                            //TODO coinsapi set coins
-                            player.sendMessage(prefix + "Da du das Item bereits besitzt hast du Punkte erhalten.");
+                            PointsManager.addPoints(player, 100);
+                            player.sendMessage(prefix + "§aDa du das Item bereits besitzt hast du 100 Punkte erhalten.");
                         } else {
                             lobbyPlayer.getCosmetics().add(currentCrate.getCosmeticId());
-                            player.sendMessage(prefix + "Du hast ein Item erhalten.");
-                            //TODO send Message
+                            player.sendMessage(prefix + "§eDu hast folgendes Item erhalten:");
+                            player.sendMessage(prefix + "§e" + currentCrate.getDescription() + "§7 | " + currentCrate.getName());
                         }
                     }
                     Location location = crateChest.getLocation().clone().subtract(5, 0, 5);
@@ -116,9 +113,9 @@ public class CrateManager {
                     if (currentHolo != null)
                         currentHolo.destroy(player);
                     currentCrate = (Crate) crates.toArray()[random.nextInt(crates.toArray().length)];
-                    currentHolo = new HoloAPI(crateChest.getHoloLocation(), "§7" + currentCrate.getName());
+                    currentHolo = new HoloAPI(crateChest.getHoloLocation(), "§e" + currentCrate.getDescription() + "§7 | " + currentCrate.getName());
                     currentHolo.display(player);
-                    player.playSound(currentHolo.getLocation(), Sound.CLICK, 0, 0);
+                    player.playSound(currentHolo.getLocation(), SoundManager.getSound(SoundManager.Sound.CLICK), 1,1);
                 }
                 counter--;
             }

@@ -23,6 +23,13 @@ public class ChatManager {
 		cfg.set("prefix", "&7[&aLobby&7] ");
 		cfg.set("nopermissions", "&cDu hast keine Rechte dafür!");
 
+		cfg.set("addpoints", "&7You added §a%v0% %v1% §7points.");
+		cfg.set("removepoints", "&7You removed §a%v0% %v1% §7points.");
+		cfg.set("setpoints", "&7You have set §a%v0% §7points to §a%v1%.");
+		cfg.set("getpoints", "&7The player §a%v0% §7has §a%v1% §7points.");
+		cfg.set("playerdoesnotexist", "&cThe §a%v0% §cdoesn't exist!");
+		cfg.set("notavalidnumber", "&cThis is not a valid number!");
+
 		try {
 			cfg.save(file);
 		} catch (IOException e1) {

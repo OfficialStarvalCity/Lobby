@@ -13,13 +13,19 @@ import org.bukkit.entity.Player;
 
 public class MySQL {
 
-    //private final SQLClient client;
-    private Connection connection;
+    private final String host;
+    private final String database;
+    private final String username;
+    private final String password;
+    private final int port;
+    private Connection connection = null;
 
-    MySQL() throws Exception {
-       /* SQLInfo sqlInfo = new SQLInfo(
-                "localhost", 3306, "lobby", "root", "1v5z6j7c");
-        this.client = new SQLClient(sqlInfo, "com.mysql.jdbc.Driver", "jdbc:mysql", 1);*/
+    public MySQL(String host, int port, String database, String username, String password) {
+        this.host = host;
+        this.port = port;
+        this.database = database;
+        this.username = username;
+        this.password = password;
         connect();
         createTable();
     }
@@ -29,7 +35,7 @@ public class MySQL {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(
-                    "jdbc:mysql://127.0.0.1:3306/bungee?autoReconnect=true", "root", "1v5z6j7c");
+                    "jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true", username, password);
         } catch (ClassNotFoundException e) {
             System.out.println("Lobby Treiber nicht gefunden");
         } catch (SQLException e) {
@@ -70,7 +76,7 @@ public class MySQL {
                 + " ENGINE=InnoDB DEFAULT CHARSET=latin1;");
 
         updateSQL("CREATE TABLE IF NOT EXISTS `players` ( `uuid` VARCHAR(99) NOT NULL, `name` VARCHAR(30) NOT NULL, \n"
-                + "  `visibility` VARCHAR(20) NOT NULL, `cosmetics` text NOT NULL, `lastDailyReward` VARCHAR(99) NOT NULL, `lastPremiumReward` VARCHAR(99) NOT NULL)"
+                + "  `visibility` VARCHAR(20) NOT NULL, `cosmetics` text NOT NULL, `lastDailyReward` VARCHAR(99) NOT NULL, `lastPremiumReward` VARCHAR(99) NOT NULL, `keys` VARCHAR(9) NOT NULL)"
                 + " ENGINE=InnoDB DEFAULT CHARSET=latin1;");
 
 
@@ -141,7 +147,7 @@ public class MySQL {
                 player = new LobbyPlayer(UUID.fromString(result.getString("uuid")),
                         result.getString("name"), Visibility.valueOf(result.getString("visibility")),
                         cosmetics, Long.valueOf(result.getString("lastDailyReward")),
-                        Long.valueOf(result.getString("lastPremiumReward")));
+                        Long.valueOf(result.getString("lastPremiumReward")), result.getInt("keys"));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -150,16 +156,16 @@ public class MySQL {
 
     }
 
-    public void addPlayer(String uuid, String name, Visibility visibility, Set<Integer> cosmetics, long lastDailyReward, long lastPremiumReward) {
+    public void addPlayer(String uuid, String name, Visibility visibility, Set<Integer> cosmetics, long lastDailyReward, long lastPremiumReward, int keys) {
         StringBuilder cosmeticString = new StringBuilder();
         for (Integer cosmeticInteger : cosmetics)
             cosmeticString.append(cosmeticInteger.toString()).append(";");
         if (getLobbyPlayer(uuid) != null) {
-            updateSQL("UPDATE `players` SET `name`='" + name + "', `visibility`='" + visibility.toString() + "', `cosmetics`='" + cosmeticString + "', `lastDailyReward`='" + String.valueOf(lastDailyReward) + "', `lastPremiumReward`='" + String.valueOf(lastPremiumReward) + "' WHERE `uuid`='" + uuid + "'");
+            updateSQL("UPDATE `players` SET `name`='" + name + "', `visibility`='" + visibility.toString() + "', `cosmetics`='" + cosmeticString + "', `lastDailyReward`='" + String.valueOf(lastDailyReward) + "', `lastPremiumReward`='" + String.valueOf(lastPremiumReward) + "', `keys`='" + keys + "' WHERE `uuid`='" + uuid + "'");
 
         } else {
-            updateSQL("INSERT INTO `players` (`uuid`, `name`, `visibility`, `cosmetics`, `lastDailyReward`, `lastPremiumReward`) VALUES ('" + uuid + "', '" + name
-                    + "', '" + visibility.toString() + "', '" + cosmeticString + "', '" + String.valueOf(lastDailyReward) + "', '" + String.valueOf(lastPremiumReward) + "')");
+            updateSQL("INSERT INTO `players` (`uuid`, `name`, `visibility`, `cosmetics`, `lastDailyReward`, `lastPremiumReward`, `keys`) VALUES ('" + uuid + "', '" + name
+                    + "', '" + visibility.toString() + "', '" + cosmeticString + "', '" + String.valueOf(lastDailyReward) + "', '" + String.valueOf(lastPremiumReward) + "', '"+keys+"')");
         }
     }
 
@@ -265,8 +271,11 @@ public class MySQL {
                 List<String> friends = new ArrayList<>();
                 String friendsResult = result.getString("playerFriends");
                 if (friendsResult != null)
-                    for (String s : friendsResult.split(";"))
-                        friends.add(getName(UUID.fromString(s)));
+                    for (String s : friendsResult.split(";")) {
+                        if (!s.trim().equals("") || s == null)
+                            friends.add(getName(UUID.fromString(s)));
+                    }
+
 
                 return new FriendPlayer(player, friends);
             }
@@ -291,5 +300,19 @@ public class MySQL {
             e1.printStackTrace();
         }
         return null;
+    }
+
+    public int getOnlineTime(UUID uuid) {
+        ResultSet result = select("SELECT `time` FROM `onlineTime` WHERE `uuid` = '" + uuid.toString() + "'");
+        if (result == null) {
+            return 0;
+        }
+        try {
+            if(result.next())
+                return result.getInt("time");
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        }
+        return 0;
     }
 }

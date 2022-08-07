@@ -9,20 +9,20 @@ public class LobbyPlayer {
     private final UUID uuid;
     private final String name;
 
-    private final HashMap<Setting, Boolean> settings = new HashMap<>();
     private Visibility visibility;
     private int keys;
     private Set<Integer> cosmetics;
     private long lastDailyReward;
     private long lastPremiumReward;
 
-    public LobbyPlayer(UUID uuid, String name, Visibility visibility, Set<Integer> cosmetics, long lastDailyReward, long lastPremiumReward) {
+    public LobbyPlayer(UUID uuid, String name, Visibility visibility, Set<Integer> cosmetics, long lastDailyReward, long lastPremiumReward, int keys) {
         this.uuid = uuid;
         this.name = name;
         this.visibility = visibility;
         this.cosmetics = cosmetics;
         this.lastDailyReward = lastDailyReward;
         this.lastPremiumReward = lastPremiumReward;
+        this.keys = keys;
     }
 
     public UUID getUuid() {
@@ -37,10 +37,6 @@ public class LobbyPlayer {
 
     public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
-    }
-
-    public HashMap<Setting, Boolean> getSettings() {
-        return settings;
     }
 
     public int getKeys() {

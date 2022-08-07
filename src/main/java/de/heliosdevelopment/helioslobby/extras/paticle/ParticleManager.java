@@ -1,55 +1,75 @@
 package de.heliosdevelopment.helioslobby.extras.paticle;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import de.heliosdevelopment.helioslobby.extras.CosmeticItem;
 import de.heliosdevelopment.helioslobby.extras.CosmeticManager;
-import de.heliosdevelopment.helioslobby.extras.CosmeticType;
-import net.minecraft.server.v1_8_R3.Packet;
 
 public class ParticleManager {
 
-	private static final Map<Player, ParticleCosmetic> particle = new HashMap<>();
+    private static final Map<Player, ParticleCosmetic> particle = new HashMap<>();
 
-	public static void addPlayer(Player player, ParticleCosmetic cosmetic) {
-		particle.put(player, cosmetic);
-	}
+    public static void addPlayer(Player player, ParticleCosmetic cosmetic) {
+        particle.put(player, cosmetic);
+    }
 
-	public static synchronized void removePlayer(Player p) {
-		ParticleCosmetic particlePlayer = particle.get(p);
-		if (particlePlayer != null) {
-			particle.remove(p);
-		}
-	}
+    private static String nmsver;
 
-	public static void playEffect(Player p) {
-		ParticleCosmetic cosmetic = particle.get(p);
-		if (cosmetic != null) {
-			sendPacket(cosmetic.getPaket(p.getLocation()));
-		}
-	}
+    static {
 
-	public static ParticleCosmetic getCosmeticByID(int id) {
-		for (CosmeticItem cosmetic : CosmeticManager.getItems(CosmeticType.PARTICLE))
-			if (((ParticleCosmetic) cosmetic).getEffect().c() == id)
-				return ((ParticleCosmetic) cosmetic);
-		return null;
-	}
+        nmsver = Bukkit.getServer().getClass().getPackage().getName();
+        nmsver = nmsver.substring(nmsver.lastIndexOf(".") + 1);
+    }
 
-	public static Map<Player, ParticleCosmetic> getParticle() {
-		return particle;
-	}
+    public static synchronized void removePlayer(Player p) {
+        ParticleCosmetic particlePlayer = particle.get(p);
+        if (particlePlayer != null) {
+            particle.remove(p);
+        }
+    }
 
-	private static void sendPacket(Packet<?> packet) {
-		for (Player player : Bukkit.getOnlinePlayers())
-			// if
-			// (SettingHandler.getPlayerSettings(player).getSettingValue(SettingHandler.getSetting(6)))
-			((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
-	}
+    public static void playEffect(Player p) {
+        ParticleCosmetic cosmetic = particle.get(p);
+        if (cosmetic != null) {
+            sendPacket(cosmetic.getPaket(p.getLocation()));
+        }
+    }
+
+    /*public static ParticleCosmetic getCosmeticByID(int id) {
+        for (CosmeticItem cosmetic : CosmeticManager.getItems(CosmeticType.PARTICLE)) {
+            if (((ParticleCosmetic) cosmetic).getEffect().c() == id)
+                return ((ParticleCosmetic) cosmetic);
+        }
+        return null;
+    }*/
+
+    public static Map<Player, ParticleCosmetic> getParticle() {
+        return particle;
+    }
+
+    private static void sendPacket(Object packet) {
+        try {
+            Class<?> c5 = Class.forName("net.minecraft.server." + nmsver + ".Packet");
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
+                Object playerConnection = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
+                playerConnection.getClass().getMethod("sendPacket", CosmeticManager.getNMSClass("Packet")).invoke(playerConnection, packet);
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -23,7 +23,6 @@ import de.heliosdevelopment.helioslobby.extras.pet.PetCosmetic;
 import de.heliosdevelopment.helioslobby.extras.pet.PetManager;
 import de.heliosdevelopment.helioslobby.utils.Item;
 import de.heliosdevelopment.helioslobby.utils.ItemCreator;
-import net.minecraft.server.v1_8_R3.EnumParticle;
 
 /**
  * @author Theis
@@ -39,62 +38,63 @@ public class CosmeticManager {
         // Heads
         cosmetics.add(new HeadCosmetic("Seelaterne", CosmeticType.HATS, Material.SEA_LANTERN, 10));
         cosmetics.add(new HeadCosmetic("Kürbis", CosmeticType.HATS, Material.PUMPKIN, 10));
-        cosmetics.add(new HeadCosmetic("Melone", CosmeticType.HATS, Material.MELON_BLOCK, 10));
+        cosmetics.add(new HeadCosmetic("Melone", CosmeticType.HATS, Material.MELON, 10));
         cosmetics.add(new HeadCosmetic("Kaktus", CosmeticType.HATS, Material.CACTUS, 10));
         cosmetics.add(new HeadCosmetic("Noten Block", CosmeticType.HATS, Material.NOTE_BLOCK, 10));
         cosmetics.add(new HeadCosmetic("Diamant", CosmeticType.HATS, Material.DIAMOND_BLOCK, 10));
         cosmetics.add(new HeadCosmetic("Smaragt", CosmeticType.HATS, Material.EMERALD_BLOCK, 10));
         cosmetics.add(new HeadCosmetic("Astronautenhelm", CosmeticType.HATS, Material.BEACON, 20));
-        cosmetics.add(new HeadCosmetic("Skelett", CosmeticType.HATS, Material.SKULL_ITEM, 20, 0));
-        cosmetics.add(new HeadCosmetic("Wither", CosmeticType.HATS, Material.SKULL_ITEM, 20, 1));
-        cosmetics.add(new HeadCosmetic("Zombie", CosmeticType.HATS, Material.SKULL_ITEM, 20, 2));
-        cosmetics.add(new HeadCosmetic("Creeper", CosmeticType.HATS, Material.SKULL_ITEM, 20, 4));
-        cosmetics.add(new HeadCosmetic("Mazes_", "Mazes_", CosmeticType.HATS, Material.SKULL_ITEM, 40, 3));
-        cosmetics.add(new HeadCosmetic("lvkaas", "lvkaas", CosmeticType.HATS, Material.SKULL_ITEM, 40, 3));
-        cosmetics.add(new HeadCosmetic("Teeage", "Teeage", CosmeticType.HATS, Material.SKULL_ITEM, 40, 3));
+        cosmetics.add(new HeadCosmetic("Skelett", CosmeticType.HATS, Material.SKELETON_SKULL, 20, 0));
+        cosmetics.add(new HeadCosmetic("Wither", CosmeticType.HATS, Material.WITHER_SKELETON_SKULL, 20, 1));
+        cosmetics.add(new HeadCosmetic("Zombie", CosmeticType.HATS, Material.ZOMBIE_HEAD, 20, 2));
+        cosmetics.add(new HeadCosmetic("Creeper", CosmeticType.HATS, Material.CREEPER_HEAD, 20, 4));
+        cosmetics.add(new HeadCosmetic("EinfachNurTommm", "Tom", CosmeticType.HATS, Material.PLAYER_HEAD, 40, 3));
+        cosmetics.add(new HeadCosmetic("byVTRX", "byVTRX", CosmeticType.HATS, Material.PLAYER_HEAD, 40, 3));
+        cosmetics.add(new HeadCosmetic("Teeage", "Teeage", CosmeticType.HATS, Material.PLAYER_HEAD, 40, 3));
 
         // Partikel
+        Class<? extends Enum> enumClass = (Class<? extends Enum>) getNMSClass("EnumParticle");
         cosmetics.add(new ParticleCosmetic("Cloud", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.CLOUD, 0.25, 0.1, 0.25, 0.1, 10));
+                Enum.valueOf(enumClass, "CLOUD"), 0.25, 0.1, 0.25, 0.1, 10));
         cosmetics.add(new ParticleCosmetic("Critical", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.CRIT, 0.5, 0.5, 0.5, 0.25, 3));
+                Enum.valueOf(enumClass, "CRIT"), 0.5, 0.5, 0.5, 0.25, 3));
         cosmetics.add(new ParticleCosmetic("Vulkan", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.LAVA, 0, 0, 0, 1, 2));
+                Enum.valueOf(enumClass, "LAVA"), 0, 0, 0, 1, 2));
         cosmetics.add(new ParticleCosmetic("Herzen", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.HEART, -0.5, 0.25, -0.5, 1, 1));
+                Enum.valueOf(enumClass, "HEART"), -0.5, 0.25, -0.5, 1, 1));
         cosmetics.add(new ParticleCosmetic("Blubber", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.WATER_DROP, 0.5, 0.0, 0.5, 1, 25));
+                Enum.valueOf(enumClass, "WATER_DROP"), 0.5, 0.0, 0.5, 1, 25));
         cosmetics.add(new ParticleCosmetic("Schneeball", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.SNOWBALL, 0.5, 0.0, 0.5, 10, 10));
+                Enum.valueOf(enumClass, "SNOWBALL"), 0.5, 0.0, 0.5, 10, 10));
         cosmetics.add(new ParticleCosmetic("Farbige Noten", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.NOTE, 0.5, 1, 0.5, 0.1, 2));
+                Enum.valueOf(enumClass, "NOTE"), 0.5, 1, 0.5, 0.1, 2));
         cosmetics.add(new ParticleCosmetic("Glücklicher Villager", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.VILLAGER_HAPPY, 0, 0, 0, 1, 5));
+                Enum.valueOf(enumClass, "VILLAGER_HAPPY"), 0, 0, 0, 1, 5));
         cosmetics.add(new ParticleCosmetic("Wütender Villager", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.VILLAGER_ANGRY, 0, 0, 0, 1, 3));
+                Enum.valueOf(enumClass, "VILLAGER_ANGRY"), 0, 0, 0, 1, 3));
         cosmetics.add(new ParticleCosmetic("Flammen", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.FLAME, 0.1, 0.1, 0.1, 0.01, 10));
+                Enum.valueOf(enumClass, "FLAME"), 0.1, 0.1, 0.1, 0.01, 10));
         cosmetics.add(new ParticleCosmetic("Hexenmagie", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.SPELL_WITCH, 0.0, 0.0, 0.0, 2, 20));
+                Enum.valueOf(enumClass, "SPELL_WITCH"), 0.0, 0.0, 0.0, 2, 20));
         cosmetics.add(new ParticleCosmetic("Buntes Flimmern", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.REDSTONE, 0.5, 0.4, 0.5, 2.0, 20));
+                Enum.valueOf(enumClass, "REDSTONE"), 0.5, 0.4, 0.5, 2.0, 20));
         cosmetics.add(new ParticleCosmetic("Lavadrip", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.DRIP_LAVA, 0.0, 0.0, 0.0, 5.0, 20));
+                Enum.valueOf(enumClass, "DRIP_LAVA"), 0.0, 0.0, 0.0, 5.0, 20));
         cosmetics.add(new ParticleCosmetic("Portal", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.PORTAL, 0.0, 0.0, 0.0, 1.0, 15));
+                Enum.valueOf(enumClass, "PORTAL"), 0.0, 0.0, 0.0, 1.0, 15));
         cosmetics.add(new ParticleCosmetic("Wirbel", CosmeticType.PARTICLE, Material.BLAZE_POWDER, 15,
-                EnumParticle.SPELL, 0.0, 0.0, 0.0, 0.0, 10));
+                Enum.valueOf(enumClass, "SPELL"), 0.0, 0.0, 0.0, 0.0, 10));
 
         // Pets
-        cosmetics.add(new PetCosmetic("Kuh", CosmeticType.PETS, Material.MONSTER_EGG, 30, 92, EntityType.COW));
-        cosmetics.add(new PetCosmetic("Schwein", CosmeticType.PETS, Material.MONSTER_EGG, 30, 90, EntityType.PIG));
-        cosmetics.add(new PetCosmetic("Schaaf", CosmeticType.PETS, Material.MONSTER_EGG, 30, 91, EntityType.SHEEP));
-        cosmetics.add(new PetCosmetic("Wolf", CosmeticType.PETS, Material.MONSTER_EGG, 30, 95, EntityType.WOLF));
-        cosmetics.add(new PetCosmetic("Katze", CosmeticType.PETS, Material.MONSTER_EGG, 30, 98, EntityType.OCELOT));
-        cosmetics.add(new PetCosmetic("Huhn", CosmeticType.PETS, Material.MONSTER_EGG, 30, 93, EntityType.CHICKEN));
+        cosmetics.add(new PetCosmetic("Kuh", CosmeticType.PETS, Material.COW_SPAWN_EGG, 30, 92, EntityType.COW));
+        cosmetics.add(new PetCosmetic("Schwein", CosmeticType.PETS, Material.PIG_SPAWN_EGG, 30, 90, EntityType.PIG));
+        cosmetics.add(new PetCosmetic("Schaf", CosmeticType.PETS, Material.SHEEP_SPAWN_EGG, 30, 91, EntityType.SHEEP));
+        cosmetics.add(new PetCosmetic("Wolf", CosmeticType.PETS, Material.WOLF_SPAWN_EGG, 30, 95, EntityType.WOLF));
+        cosmetics.add(new PetCosmetic("Katze", CosmeticType.PETS, Material.OCELOT_SPAWN_EGG, 30, 98, EntityType.OCELOT));
+        cosmetics.add(new PetCosmetic("Huhn", CosmeticType.PETS, Material.CHICKEN_SPAWN_EGG, 30, 93, EntityType.CHICKEN));
         cosmetics.add(
-                new PetCosmetic("Pilz Kuh", CosmeticType.PETS, Material.MONSTER_EGG, 30, 96, EntityType.MUSHROOM_COW));
-        cosmetics.add(new PetCosmetic("Hase", CosmeticType.PETS, Material.MONSTER_EGG, 30, 101, EntityType.RABBIT));
+                new PetCosmetic("Pilz Kuh", CosmeticType.PETS, Material.MOOSHROOM_SPAWN_EGG, 30, 96, EntityType.MUSHROOM_COW));
+        cosmetics.add(new PetCosmetic("Hase", CosmeticType.PETS, Material.RABBIT_SPAWN_EGG, 30, 101, EntityType.RABBIT));
     }
 
     public static void openInventory(Player p, CosmeticType type, int site) {
@@ -129,7 +129,7 @@ public class CosmeticManager {
 
         Inventory inv = Bukkit.createInventory(null, 45, "§7Cosmetics");
 
-        Item pane = new Item(Material.STAINED_GLASS_PANE, 1, 7);
+        Item pane = new Item(Material.GRAY_STAINED_GLASS_PANE, 1, 0);
         pane.setName(" ");
         // int[] pos = new int[] { 1, 10, 19, 28, 37, 48, 49, 51, 52 };
         for (int i = 0; i < inv.getSize(); i++)
@@ -143,7 +143,7 @@ public class CosmeticManager {
             else
                 inv.setItem(positions[i], temp.get(i).getItem(hasItem, hasPermission));
         }
-        new ItemCreator(Material.SKULL_ITEM, 1).durability(3).setSkullOwner("MHF_ArrowLeft").setName("§7Zurück")
+        new ItemCreator(Material.PLAYER_HEAD, 1).durability(3).setSkullOwner("MHF_ArrowLeft").setName("§7Zurück")
                 .setSlot(inv, inv.getSize() - 1);
         String name = "";
         switch (type) {
@@ -209,17 +209,17 @@ public class CosmeticManager {
 
         Inventory inv = Bukkit.createInventory(null, 36, "§7Cosmetics");
 
-        Item pane = new Item(Material.STAINED_GLASS_PANE, 1, 7);
+        Item pane = new Item(Material.GRAY_STAINED_GLASS_PANE, 1, 7);
         pane.setName(" ");
         // int[] pos = new int[] { 1, 10, 19, 28, 37, 48, 49, 51, 52 };
         for (int i = 0; i < inv.getSize(); i++)
             inv.setItem(i, pane.getItem());
 
-        Item skull = new Item(Material.SKULL_ITEM, 1, 3);
+        Item skull = new Item(Material.PLAYER_HEAD, 1, 3);
         skull.setSkullOwner(player.getName());
         skull.setName("§eHüte");
         inv.setItem(13, skull.getItem());
-        Item pets = new Item(Material.MONSTER_EGG, 1, 101);
+        Item pets = new Item(Material.WOLF_SPAWN_EGG, 1, 101);
         pets.setName("§eHaustiere");
         inv.setItem(24, pets.getItem());
         // Item armor = new Item(Material.IRON_CHESTPLATE);
@@ -277,20 +277,20 @@ public class CosmeticManager {
     }
 
     public static void openBuyingInventory(Player player, int cosmeticId) {
-        Inventory inventory = Bukkit.createInventory(null, InventoryType.HOPPER, "§eKaufen");
+        Inventory inventory = Bukkit.createInventory(null, InventoryType.HOPPER, "§eExtra kaufen");
         CosmeticItem cosmeticItem = getCosmeticItem(cosmeticId);
         if (cosmeticItem == null) return;
         ItemStack cosmetic = cosmeticItem.getItem(false, false);
-        Item accept = new Item(Material.WOOL, 1, 5);
-        Item deny = new Item(Material.WOOL, 1, 14);
+        Item accept = new Item(Material.LIME_WOOL, 1, 5);
+        Item deny = new Item(Material.RED_WOOL, 1, 14);
         accept.setName("§aKaufen");
         deny.setName("§cAbbrechen");
         inventory.setItem(0, cosmetic);
         inventory.setItem(3, accept.getItem());
         inventory.setItem(4, deny.getItem());
-        new ItemCreator(Material.STAINED_GLASS_PANE, 1).durability(7).hideFlags().setName("§1").setSlot(inventory,
+        new ItemCreator(Material.GRAY_STAINED_GLASS_PANE, 1).durability(7).hideFlags().setName("§1").setSlot(inventory,
                 1);
-        new ItemCreator(Material.STAINED_GLASS_PANE, 1).durability(7).hideFlags().setName("§1").setSlot(inventory,
+        new ItemCreator(Material.GRAY_STAINED_GLASS_PANE, 1).durability(7).hideFlags().setName("§1").setSlot(inventory,
                 2);
         player.openInventory(inventory);
     }
@@ -306,7 +306,7 @@ public class CosmeticManager {
             item.setLore("§7Klicke um dein Schaf zu färben.");
             inv.addItem(item.getItem());
         }
-        new ItemCreator(Material.SKULL_ITEM, 1).durability(3).setSkullOwner("MHF_ArrowLeft").setName("§7Zurück")
+        new ItemCreator(Material.PLAYER_HEAD, 1).durability(3).setSkullOwner("MHF_ArrowLeft").setName("§7Zurück")
                 .setSlot(inv, inv.getSize() - 1);
         player.openInventory(inv);
     }
@@ -391,5 +391,15 @@ public class CosmeticManager {
 
     public static Map<Player, Integer> getInBuying() {
         return inBuying;
+    }
+
+    public static Class<?> getNMSClass(String name) {
+        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        try {
+            return Class.forName("net.minecraft.server." + version + "." + name);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

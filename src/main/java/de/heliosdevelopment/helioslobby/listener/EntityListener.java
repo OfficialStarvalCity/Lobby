@@ -1,18 +1,13 @@
 package de.heliosdevelopment.helioslobby.listener;
 
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.EntityBlockFormEvent;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityPortalEvent;
-import org.bukkit.event.entity.SheepDyeWoolEvent;
-import org.bukkit.event.entity.SheepRegrowWoolEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 
 import de.heliosdevelopment.helioslobby.extras.pet.PetManager;
@@ -48,6 +43,9 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
 		if ((e.getEntity() instanceof Player & !(e.getDamager() instanceof Player))) {
+			e.setCancelled(true);
+		}
+		if(e.getDamager() instanceof Player){
 			e.setCancelled(true);
 		}
 	}
@@ -89,16 +87,23 @@ public class EntityListener implements Listener {
 	}
 
 
-//	@EventHandler
-//	public void onCreatureSpawn(CreatureSpawnEvent e) {
-//		if (PetManager.getPet(e.getEntity().getEntityId()) == null)
-//			e.setCancelled(true);
-//	}
-//
-//	@EventHandler
-//	public void onEntitySpawn(EntitySpawnEvent e) {
-//		if (PetManager.getPet(e.getEntity().getEntityId()) == null)
-//			e.setCancelled(true);
-//	}
+	/*@EventHandler
+	public void onCreatureSpawn(CreatureSpawnEvent e) {
+		if (PetManager.getPet(e.getEntity().getEntityId()) == null)
+			e.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onEntitySpawn(EntitySpawnEvent e) {
+		if(e.getEntity() instanceof ArmorStand)
+			return;
+		if (PetManager.getPet(e.getEntity().getEntityId()) == null)
+			e.setCancelled(true);
+	}*/
+	@EventHandler
+	public void onArmorStandInteract(PlayerArmorStandManipulateEvent event){
+		event.setCancelled(true);
+	}
+
 
 }

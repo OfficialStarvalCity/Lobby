@@ -9,7 +9,7 @@ import de.heliosdevelopment.helioslobby.item.ItemManager;
 
 public class ClearCommand extends LobbyCommand {
 
-	private final ItemManager itemManager = new ItemManager(Lobby.getInstance().getFriendManager());
+	private final ItemManager itemManager = Lobby.getInstance().getItemManager();
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

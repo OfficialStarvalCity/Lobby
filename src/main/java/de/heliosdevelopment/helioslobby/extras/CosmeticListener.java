@@ -1,12 +1,10 @@
 package de.heliosdevelopment.helioslobby.extras;
 
+import de.heliosdevelopment.helioslobby.manager.SoundManager;
 import de.heliosdevelopment.helioslobby.player.LobbyPlayer;
 import de.heliosdevelopment.helioslobby.player.PlayerManager;
-import de.heliosdevelopment.helioslobby.utils.ActionBar;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import de.heliosdevelopment.helioslobby.utils.PointsManager;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
@@ -31,25 +29,22 @@ public class CosmeticListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Player p = (Player) event.getWhoClicked();
-        if (event.getInventory().getName().equalsIgnoreCase("§7Cosmetics")) {
+        Player player = (Player) event.getWhoClicked();
+        if (event.getView().getTitle().equalsIgnoreCase("§7Cosmetics")) {
             if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR
                     || event.getCurrentItem().getItemMeta().getDisplayName() == null)
                 return;
             event.setCancelled(true);
-            // CosmeticItem cosmetic = CosmeticManager.getCosmeticItem(
-            // Integer.valueOf(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getLore().get(2))));
-            LobbyPlayer lobbyPlayer = PlayerManager.getPlayer(p);
+            LobbyPlayer lobbyPlayer = PlayerManager.getPlayer(player);
             if (lobbyPlayer == null) return;
             CosmeticItem cosmetic = CosmeticManager.getCosmeticItem(event.getCurrentItem().getType(),
                     ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()));
             if (cosmetic != null) {
-                if (lobbyPlayer.getCosmetics().contains(cosmetic.getId())
-                        || p.hasPermission("lobby.unlockall"))
-                    cosmetic.equipItem(p);
+                if (lobbyPlayer.getCosmetics().contains(cosmetic.getId()) || player.hasPermission("lobby.unlockall"))
+                    cosmetic.equipItem(player);
                 else {
-                    CosmeticManager.getInBuying().put(p, cosmetic.getId());
-                    CosmeticManager.openBuyingInventory(p, cosmetic.getId());
+                    CosmeticManager.getInBuying().put(player, cosmetic.getId());
+                    CosmeticManager.openBuyingInventory(player, cosmetic.getId());
                 }
 
             } else {
@@ -64,43 +59,41 @@ public class CosmeticListener implements Listener {
                         return;
                     case "Zurück":
                         if (event.getClickedInventory().getSize() == 45)
-                            CosmeticManager.openMainInventory(p);
-                        // else
-                        // Management.openManagementInventory(p);
+                            CosmeticManager.openMainInventory(player);
                         return;
                     case "Extras zurücksetzen":
-                        ParticleManager.removePlayer(p);
-                        p.getInventory().setArmorContents(null);
-                        PetManager.despawnPet(p);
+                        ParticleManager.removePlayer(player);
+                        player.getInventory().setArmorContents(null);
+                        PetManager.despawnPet(player);
                         return;
                     case "Hut entfernen":
-                        p.getInventory().setHelmet(null);
-                        p.updateInventory();
+                        player.getInventory().setHelmet(null);
+                        player.updateInventory();
                         return;
                     case "Partikeleffekt entfernen":
-                        ParticleManager.removePlayer(p);
+                        ParticleManager.removePlayer(player);
                         return;
                     case "Haustier ins Tierheim geben":
-                        PetManager.despawnPet(p);
+                        PetManager.despawnPet(player);
                         return;
                     default:
                         CosmeticType type = CosmeticType
                                 .getCosmeticTypebyName(event.getCurrentItem().getItemMeta().getDisplayName());
                         if (type != null)
-                            CosmeticManager.openInventory(p, type, 1);
+                            CosmeticManager.openInventory(player, type, 1);
                 }
             }
-        } else if (event.getInventory().getName().equalsIgnoreCase("§ePet")) {
+        } else if (event.getView().getTitle().equalsIgnoreCase("§ePet")) {
             event.setCancelled(true);
-            Pet pet = PetManager.getPet(p);
+            Pet pet = PetManager.getPet(player);
             switch (ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName())) {
                 case "Name ändern":
-                    p.closeInventory();
+                    player.closeInventory();
                     new BukkitRunnable() {
 
                         @Override
                         public void run() {
-                            final AnvilGUI gui = new AnvilGUI(p, event1 -> {
+                            final AnvilGUI gui = new AnvilGUI(player, event1 -> {
                                 if (event1.getSlot() == AnvilGUI.AnvilSlot.OUTPUT) {
                                     event1.setWillClose(true);
                                     event1.setWillDestroy(true);
@@ -108,7 +101,7 @@ public class CosmeticListener implements Listener {
                                             || event1.getName().equalsIgnoreCase("dinnerbone")) {
                                         event1.setWillClose(false);
                                         event1.setWillDestroy(false);
-                                        p.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDieser Name ist nicht erlaubt!");
+                                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDieser Name ist nicht erlaubt!");
                                         return;
                                     }
                                     assert pet != null;
@@ -128,47 +121,47 @@ public class CosmeticListener implements Listener {
                     }.runTaskLater(Lobby.getInstance(), 3);
                     return;
                 case "Füttern (Premium)":
-                    if (p.hasPermission("lobby.premium")) {
+                    if (player.hasPermission("lobby.premium")) {
                         assert pet != null;
                         pet.changeAge();
                     } else
-                        p.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu benötigst hierfür den Premium Rang!");
+                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu benötigst hierfür den Premium Rang!");
                     break;
                 case "Diät machen (Premium)":
-                    if (p.hasPermission("lobby.premium")) {
+                    if (player.hasPermission("lobby.premium")) {
                         assert pet != null;
                         pet.changeAge();
                     } else
-                        p.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu benötigst hierfür den Premium Rang!");
+                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu benötigst hierfür den Premium Rang!");
                     break;
                 case "Reiten (Premium)":
-                    if (p.hasPermission("lobby.premium")) {
+                    if (player.hasPermission("lobby.premium")) {
                         assert pet != null;
-                        pet.rideAnimal(p);
+                        pet.rideAnimal(player);
                     } else
-                        p.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu benötigst hierfür den Premium Rang!");
+                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu benötigst hierfür den Premium Rang!");
                     break;
                 case "Färben (Premium)":
-                    if (p.hasPermission("lobby.premium")) {
-                        CosmeticManager.openColorInventory(p);
+                    if (player.hasPermission("lobby.premium")) {
+                        CosmeticManager.openColorInventory(player);
                         return;
                     } else
-                        p.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu benötigst hierfür den Premium Rang!");
+                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu benötigst hierfür den Premium Rang!");
                     break;
                 case "Haustier freilassen":
-                    PetManager.despawnPet(p);
-                    p.closeInventory();
+                    PetManager.despawnPet(player);
+                    player.closeInventory();
                     return;
                 default:
                     return;
             }
-            openInventory(p, pet);
-        } else if (event.getInventory().getName().equalsIgnoreCase("§eFärben")) {
+            openInventory(player, pet);
+        } else if (event.getView().getTitle().equalsIgnoreCase("§eFärben")) {
             event.setCancelled(true);
-            Pet pet = PetManager.getPet(p);
+            Pet pet = PetManager.getPet(player);
             if (pet == null) return;
             if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase("§7Zurück")) {
-                openInventory(p, pet);
+                openInventory(player, pet);
                 return;
             }
             DyeColor color = DyeColor
@@ -176,26 +169,38 @@ public class CosmeticListener implements Listener {
             if (pet.getAnimal().getType() == EntityType.SHEEP) {
                 Sheep sheep = (Sheep) pet.getAnimal();
                 sheep.setColor(color);
-                p.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Dein Haustier hat nun die Farbe §e" + color.name());
+                player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Dein Haustier hat nun die Farbe §e" + color.name());
             }
-        } else if (event.getInventory().getName().equalsIgnoreCase("§eKaufen")) {
+        } else if (event.getView().getTitle().equalsIgnoreCase("§eExtra kaufen")) {
             if (event.getCurrentItem().getItemMeta().getDisplayName().equals("§aKaufen")) {
-                //TODO POINTS
-                Integer id = CosmeticManager.getInBuying().get(p);
+                Integer id = CosmeticManager.getInBuying().get(player);
                 if (id == null) return;
-                LobbyPlayer lobbyPlayer = PlayerManager.getPlayer(p);
+                LobbyPlayer lobbyPlayer = PlayerManager.getPlayer(player);
                 if (lobbyPlayer == null) return;
-                if (!lobbyPlayer.getCosmetics().contains(id))
-                    lobbyPlayer.getCosmetics().add(id);
-                p.closeInventory();
-                ActionBar.sendActionBar(p, Lobby.getInstance().getChatManager().getMessage("prefix") + "§aDu hast dir erfolgreich ein neues Extra gekauft.");
+
+                CosmeticItem item = CosmeticManager.getCosmeticItem(id);
+                if (item == null)
+                    return;
+                if (PointsManager.removePoints(player, item.getPrice())) {
+                    if (!lobbyPlayer.getCosmetics().contains(id))
+                        lobbyPlayer.getCosmetics().add(id);
+                    player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§aDu hast dir erfolgreich ein neues Extra gekauft.");
+                    player.playSound(player.getLocation(), SoundManager.getSound(SoundManager.Sound.LEVEL_UP), 1,1);
+                } else {
+                    player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu hast nicht genug Punkte!");
+                    player.playSound(player.getLocation(), SoundManager.getSound(SoundManager.Sound.ITEM_BREAK), 1,1);
+                }
+                CosmeticManager.getInBuying().remove(player);
+                player.closeInventory();
             } else if (event.getCurrentItem().getItemMeta().getDisplayName().equals("§cAbbrechen")) {
-                CosmeticManager.getInBuying().remove(p);
-                CosmeticManager.openMainInventory(p);
+                CosmeticManager.getInBuying().remove(player);
+                CosmeticManager.openMainInventory(player);
+                player.playSound(player.getLocation(), SoundManager.getSound(SoundManager.Sound.WOOD_CLICK), 1,1);
             }
             event.setCancelled(true);
 
         }
+
     }
 
     @EventHandler
@@ -231,7 +236,7 @@ public class CosmeticListener implements Listener {
 
     private void openInventory(Player p, Pet pet) {
         Inventory inv = Bukkit.createInventory(null, 27, "§ePet");
-        Item pane = new Item(Material.STAINED_GLASS_PANE, 1, 15);
+        Item pane = new Item(Material.BLACK_STAINED_GLASS_PANE, 1, 0);
         pane.setName(" ");
         for (int i = 0; i < 27; i++) {
             inv.setItem(i, pane.getItem());

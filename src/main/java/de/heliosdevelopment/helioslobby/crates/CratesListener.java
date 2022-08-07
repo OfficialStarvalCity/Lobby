@@ -1,5 +1,6 @@
 package de.heliosdevelopment.helioslobby.crates;
 
+import de.heliosdevelopment.helioslobby.Lobby;
 import de.heliosdevelopment.helioslobby.player.LobbyPlayer;
 import de.heliosdevelopment.helioslobby.player.PlayerManager;
 import de.heliosdevelopment.helioslobby.utils.ActionBar;
@@ -36,7 +37,8 @@ public class CratesListener implements Listener {
                             ActionBar.sendActionBar(event.getPlayer(), "§eDeine Kiste wird geöffnet...");
                             crateManager.openCrate(event.getPlayer(), chest);
                         } else {
-                            ActionBar.sendActionBar(event.getPlayer(), "§cDu besitzt keine Schlüssel.");
+                            ActionBar.sendActionBar(event.getPlayer(), "§cDu besitzt keinen Schlüssel.");
+                            event.getPlayer().sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDu benötigst einen Schlüssel um diese Kiste zu öffnen!");
                         }
                     } else {
                         ActionBar.sendActionBar(event.getPlayer(), "§cDiese Kiste wird bereits geöffnet!");

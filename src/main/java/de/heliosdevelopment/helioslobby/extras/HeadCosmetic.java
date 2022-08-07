@@ -25,7 +25,7 @@ public class HeadCosmetic extends CosmeticItem {
 	@Override
 	public void equipItem(Player player) {
 		Item skull = new Item(getMaterial(), 1, getData());
-		if (getMaterial() == Material.SKULL_ITEM || getData() == 3) {
+		if (getMaterial() == Material.PLAYER_HEAD || getData() == 3) {
 			if (headName != null) {
 				skull.setSkullOwner(getName());
 				skull.setName("§7" + getName() + "'s Kopf");

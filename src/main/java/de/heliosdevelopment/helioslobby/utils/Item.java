@@ -193,7 +193,7 @@ public class Item {
 	/**
 	 * Set the amount of the item
 	 *
-	 * @param m
+	 * @param amount
 	 *            Amount of the item
 	 */
 	public void setAmount(int amount) {
@@ -214,7 +214,7 @@ public class Item {
 	/**
 	 * Set the data of the item
 	 *
-	 * @param colorid
+	 * @param data
 	 *            Color-id
 	 */
 	public void setData(int data) {
@@ -285,7 +285,7 @@ public class Item {
 		if (dataid != 0) {
 			i = new ItemStack(i.getType(), i.getAmount(), dataid);
 		}
-		if (skull != null && i.getType() == Material.SKULL_ITEM) {
+		if (skull != null && i.getType() == Material.PLAYER_HEAD) {
 			SkullMeta meta = (SkullMeta) i.getItemMeta();
 			meta.setOwner(skull);
 			meta.setDisplayName(m.getDisplayName());

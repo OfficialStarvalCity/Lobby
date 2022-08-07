@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.heliosdevelopment.helioslobby.manager.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -25,6 +27,7 @@ public class NavigatorManager {
 
     public static void openNavigator(Player player) {
         player.openInventory(inventory);
+        player.playSound(player.getLocation(), SoundManager.getSound(SoundManager.Sound.CHEST_OPEN), 1, 1);
     }
 
     public static void init() {
@@ -43,7 +46,7 @@ public class NavigatorManager {
         }
 
         for (Integer i = 0; i < inventory.getSize(); i++) {
-            new ItemCreator(Material.STAINED_GLASS_PANE, 1).durability(7).hideFlags().setName("§1").setSlot(inventory,
+            new ItemCreator(Material.GRAY_STAINED_GLASS_PANE, 1).durability(7).hideFlags().setName("§1").setSlot(inventory,
                     i);
         }
         for (NavigatorItem item : items) {

@@ -3,6 +3,7 @@ package de.heliosdevelopment.helioslobby.manager;
 import de.heliosdevelopment.helioslobby.Lobby;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -41,7 +42,7 @@ public class HideManager {
 			lobbyPlayer.setVisibility(Visibility.ALL);
 			dye.setColor(DyeColor.LIME);
 			meta.setDisplayName("§7× §eSpieler Verstecken §7×");
-			player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix")+"§7Dir werden nur nun §aalle §7Spieler angezeigt.");
+			player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix")+"§7Dir werden nun §aalle §7Spieler angezeigt.");
 			break;
 		case PREMIUM:
 			for (Player players : Bukkit.getOnlinePlayers()) {
@@ -58,8 +59,8 @@ public class HideManager {
 		}
 		ItemStack stack = dye.toItemStack(1);
 		stack.setItemMeta(meta);
-	//	item.setItemMeta(meta);
 		player.setItemInHand(stack);
+		player.playSound(player.getLocation(), SoundManager.getSound(SoundManager.Sound.NOTE_PIANO), 1, 1);
 	}
 
 }
