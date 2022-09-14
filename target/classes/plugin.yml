@@ -1,6 +1,6 @@
 name: Lobby
 author: EinfachNurTommm
-version: ${project.version}
+version: 1.2.1
 main: de.heliosdevelopment.helioslobby.Lobby
 softdepend: [Vault]
 commands:

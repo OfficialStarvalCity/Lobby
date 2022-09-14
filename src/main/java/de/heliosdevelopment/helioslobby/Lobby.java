@@ -190,7 +190,7 @@ public class Lobby extends JavaPlugin {
         return instance;
     }
 
-    public MySQL getMysql1() {
+    public MySQL getMysql() {
         return mysql;
     }
 

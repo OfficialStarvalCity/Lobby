@@ -2,7 +2,6 @@ package de.heliosdevelopment.helioslobby.friends;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import de.heliosdevelopment.helioscore.nicksystem.api.NickChangeEvent;
 import de.heliosdevelopment.helioslobby.Lobby;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -43,12 +42,12 @@ public class FriendListener implements Listener {
         Inventory inventory = event.getInventory();
         ItemStack currentItem = event.getCurrentItem();
 
-        if(inventory.getName().equalsIgnoreCase("§eFreunde §8» §7Menü")) {
+        if(event.getView().getTitle().equalsIgnoreCase("§eFreunde §8» §7Menü")) {
 
-            if(currentItem.getType() == Material.SKULL_ITEM)
+            if(currentItem.getType() == Material.PLAYER_HEAD)
                 friendManager.openPlayerInventory(player, currentItem.getItemMeta().getDisplayName());
 
-        } else if(inventory.getName().equalsIgnoreCase("§eFreunde §8» §7Infos")) {
+        } else if(event.getView().getTitle().equalsIgnoreCase("§eFreunde §8» §7Infos")) {
             event.setCancelled(true);
 
             if(currentItem.getType() == Material.LAVA_BUCKET) {
@@ -58,21 +57,11 @@ public class FriendListener implements Listener {
                 player.sendPluginMessage(Lobby.getInstance(), "Lobby", out.toByteArray());
                 player.closeInventory();
             }
-            else if(currentItem.getType() == Material.WOOD_DOOR)
+            else if(currentItem.getType() == Material.OAK_DOOR)
                 friendManager.openFriendInventory(player);
 
         }
 
-    }
-
-    @EventHandler
-    public void onNickChange(NickChangeEvent event){
-        event.getPlayer();
-        event.getExecutionTry();
-        event.getNickData();
-
-        event.setCancelled(true);
-        event.isCancelled();
     }
 
 }

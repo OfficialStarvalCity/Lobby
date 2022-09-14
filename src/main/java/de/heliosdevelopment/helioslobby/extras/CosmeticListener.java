@@ -22,7 +22,6 @@ import de.heliosdevelopment.helioslobby.Lobby;
 import de.heliosdevelopment.helioslobby.extras.paticle.ParticleManager;
 import de.heliosdevelopment.helioslobby.extras.pet.Pet;
 import de.heliosdevelopment.helioslobby.extras.pet.PetManager;
-import de.heliosdevelopment.helioslobby.extras.util.AnvilGUI;
 import de.heliosdevelopment.helioslobby.utils.Item;
 
 public class CosmeticListener implements Listener {
@@ -93,29 +92,23 @@ public class CosmeticListener implements Listener {
 
                         @Override
                         public void run() {
-                            final AnvilGUI gui = new AnvilGUI(player, event1 -> {
-                                if (event1.getSlot() == AnvilGUI.AnvilSlot.OUTPUT) {
-                                    event1.setWillClose(true);
-                                    event1.setWillDestroy(true);
-                                    if (event1.getName().equalsIgnoreCase("jeb_")
-                                            || event1.getName().equalsIgnoreCase("dinnerbone")) {
-                                        event1.setWillClose(false);
-                                        event1.setWillDestroy(false);
-                                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDieser Name ist nicht erlaubt!");
-                                        return;
-                                    }
-                                    assert pet != null;
-                                    pet.setName(ChatColor.translateAlternateColorCodes('&', event1.getName()));
-                                } else {
-                                    event1.setWillClose(false);
-                                    event1.setWillDestroy(false);
-                                }
-                            });
+                            new net.wesjd.anvilgui.AnvilGUI.Builder()
+                                    .onComplete((player, text) -> {                                    //called when the inventory output slot is clicked
+                                        if(text != "jeb_" || text != "dinnerbone") {
+                                            assert pet != null;
+                                            pet.setName(ChatColor.translateAlternateColorCodes('&', text));
+                                            return net.wesjd.anvilgui.AnvilGUI.Response.close();
+                                        } else {
+                                            player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§cDieser Name ist nicht erlaubt!");
+                                            return net.wesjd.anvilgui.AnvilGUI.Response.text("Incorrect.");
+                                        }
+                                    })
+                                    .open(player);
+
+
                             Item i = new Item(Material.NAME_TAG);
                             assert pet != null;
                             i.setName(pet.getName());
-                            gui.setSlot(AnvilGUI.AnvilSlot.INPUT_LEFT, i.getItem());
-                            gui.open();
                         }
 
                     }.runTaskLater(Lobby.getInstance(), 3);

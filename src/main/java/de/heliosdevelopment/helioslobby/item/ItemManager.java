@@ -47,35 +47,6 @@ public class ItemManager {
                 }
             });
         }
-        if (SettingManager.getSetting("nickitem").isEnabled()) {
-            items.add(new LobbyItem("§7× §eNick §7×", Material.NAME_TAG, "lobby.advanced", null, null) {
-                @Override
-                public void onInteract(Player player) {
-                    if (!cooldown.contains(player)) {
-                        boolean nicked = core.isNicked(player);
-                        if (core.isNicked(player)) {
-                            core.updateNick(player, false);
-                            player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Du hast die Auto-Nick Funktion deaktiviert.");
-                        } else {
-                            core.updateNick(player, true);
-                            player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix") + "§7Du hast die Auto-Nick Funktion aktiviert.");
-                        }
-                        cooldown.add(player);
-                        new BukkitRunnable() {
-
-                            @Override
-                            public void run() {
-                                cooldown.remove(player);
-                            }
-
-                        }.runTaskLater(Lobby.getInstance(), 100);
-                    } else {
-                        player.sendMessage(Lobby.getInstance().getChatManager().getMessage("prefix")
-                                + "§cDu musst noch einige Sekunden warten, bis du diese Funktion wieder verwenden kannst.");
-                    }
-                }
-            });
-        }
         if (SettingManager.getSetting("hideplayeritem").isEnabled()) {
             Dye dye = new Dye();
             dye.setColor(DyeColor.LIME);
@@ -112,7 +83,7 @@ public class ItemManager {
             });
         }
         if (SettingManager.getSetting("friendsitem").isEnabled()) {
-            items.add(new LobbyItem("§7× §eFreunde §7×", Material.SKULL_ITEM, "", null, null) {
+            items.add(new LobbyItem("§7× §eFreunde §7×", Material.PLAYER_HEAD, "", null, null) {
                 @Override
                 public void onInteract(Player player) {
                     friendManager.openFriendInventory(player);
@@ -154,7 +125,7 @@ public class ItemManager {
         int[] position = getPosition(list.size());
         for (int i = 0; i < list.size(); i++) {
             ItemStack item = list.get(i).getItem();
-            if (item.getType() == Material.SKULL_ITEM) {
+            if (item.getType() == Material.PLAYER_HEAD) {
                 SkullMeta meta = (SkullMeta) item.getItemMeta();
                 meta.setOwner(player.getName());
                 item.setItemMeta(meta);
